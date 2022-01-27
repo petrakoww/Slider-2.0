@@ -7,16 +7,14 @@ function slider(sliderContainer) {
     ".carousel-slide img"
   );
 
-  let currentSlideIndex = 0;
+  let currentSlideIndex = 0,
+    transitionSize = 0,
+    startPosOfLastElement = 0;
   let slideWidths = [];
-  let currentImageSize = 0;
-  let transitionSize = 0;
   let numberOfElementsInCarousel = slidesInCarousel.length;
-  let startPosOfLastElement = 0;
-  let start, currPosition, navigationDots;
-  let dot, moveToSlide;;
+  let start, currPosition, navigationDots, dot, moveToSlide;
 
-  //get sizes of images in array to use currentImageSize with [counter] + full width of carousel
+  //gets startPosOfLastElement + full width of carousel
   slidesInCarousel.forEach((slide, index) => {
     slideWidths.push(slide.clientWidth);
     if (index < numberOfElementsInCarousel - 1) {
@@ -24,8 +22,32 @@ function slider(sliderContainer) {
     }
   });
 
-  function goToSlide(slideToGo){
-    
+  function InputDiv() {
+    const inputDiv = document.createElement("div");
+    sliderContainer.insertAdjacentElement("afterend", inputDiv);
+
+    const goInput = document.createElement("input");
+    goInput.type = "number";
+    goInput.min = "0";
+    goInput.max = numberOfElementsInCarousel - 1;
+    inputDiv.insertAdjacentElement("afterbegin", goInput);
+
+    const goButton = document.createElement("button");
+    goButton.textContent = "GO";
+    inputDiv.insertAdjacentElement("beforeend", goButton);
+
+    goButton.addEventListener("click", () => {
+      if (
+        goInput.value < 0 ||
+        goInput.value >= numberOfElementsInCarousel - 1 ||
+        goInput.value == ""
+      ) {
+        return;
+      }
+      goToSlide(goInput.value);
+    });
+  }
+  function goToSlide(slideToGo) {
     transitionSize = 0;
     slidesInCarousel.forEach((slide, index) => {
       if (index < slideToGo) {
@@ -45,7 +67,6 @@ function slider(sliderContainer) {
     moveToSlide = slideToGo;
     console.log(currentSlideIndex, numberOfElementsInCarousel);
   }
-
   function createNavDots() {
     const dotsContainer = document.createElement("div");
     dotsContainer.classList.add("alignCenter");
@@ -83,25 +104,22 @@ function slider(sliderContainer) {
       }
     });
   }
-  
   function moveSlide(direction) {
     if (direction === "next") {
-      if (currentSlideIndex >= numberOfElementsInCarousel-1) {
-        goToSlide(0)
-      }else{
-
+      if (currentSlideIndex >= numberOfElementsInCarousel - 1) {
+        goToSlide(0);
+      } else {
         moveToSlide++;
-        goToSlide(moveToSlide)
+        goToSlide(moveToSlide);
       }
     } else if (direction === "prev") {
       if (currentSlideIndex <= 0) {
-        goToSlide(numberOfElementsInCarousel-1)
-      }else{moveToSlide--;
-      goToSlide(moveToSlide)
-      console.log(moveToSlide);}
-
-
-      
+        goToSlide(numberOfElementsInCarousel - 1);
+      } else {
+        moveToSlide--;
+        goToSlide(moveToSlide);
+        console.log(moveToSlide);
+      }
     }
   }
   function buttons() {
@@ -109,12 +127,14 @@ function slider(sliderContainer) {
     //prev
     const prevButton = document.createElement("button");
     prevButton.textContent = "Prev";
-    sliderContainer.insertAdjacentElement("beforebegin", prevButton);
+    prevButton.classList.add("prevBtn");
+    sliderContainer.insertAdjacentElement("afterbegin", prevButton);
 
     //next
     const nextButton = document.createElement("button");
     nextButton.textContent = "Next";
-    sliderContainer.insertAdjacentElement("afterend", nextButton);
+    nextButton.classList.add("nextBtn");
+    sliderContainer.insertAdjacentElement("beforeend", nextButton);
 
     nextButton.addEventListener("click", () => {
       moveSlide("next");
@@ -256,6 +276,9 @@ function slider(sliderContainer) {
       createNavDots(sliderContainer.dataset.startfromindex || 0);
       goToSlide(sliderContainer.dataset.startfromindex || 0);
     }
+    if (sliderContainer.dataset.goto) {
+      InputDiv();
+    }
     if (sliderContainer.dataset.arrowkeys) {
       arrowKeys();
     }
@@ -266,7 +289,6 @@ function slider(sliderContainer) {
       draggableTouchFunction();
     }
   }
-
 
   dataSets();
   console.log(sliderContainer.attributes);
@@ -279,4 +301,3 @@ sliders.forEach((slide) => {
 });
 
 //glitch on first and last el when move
-//goToSlide input
