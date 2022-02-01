@@ -12,7 +12,9 @@ function slider(sliderContainer) {
   let slideWidths = [];
   let numberOfElementsInCarousel = slidesInCarousel.length;
   let start, currPosition, navigationDots, dot, moveToSlide, intervalAutoplay;
-  let enableAutoplay = false;
+  let enableAutoplay = false,
+    enableAutoplayButtons = false,
+    blocked = false;
   let autoPlayInterval = 5000;
 
   //gets startPosOfLastElement + full width of carousel
@@ -26,6 +28,30 @@ function slider(sliderContainer) {
   function autoplay() {
     if (enableAutoplay) {
       startAutoplay();
+      if (enableAutoplayButtons) {
+        autoPlayButtons();
+      }
+    }
+  }
+  function autoPlayButtons() {
+    const autoplayDiv = document.createElement("div");
+    sliderContainer.insertAdjacentElement("afterend", autoplayDiv);
+    const autoplayButton = document.createElement("button");
+    autoplayButton.textContent = "Pause";
+    autoplayButton.style.marginBottom = "10px";
+    autoplayDiv.insertAdjacentElement("afterbegin", autoplayButton);
+
+    autoplayButton.addEventListener("click", autoplayBtnFn);
+    function autoplayBtnFn() {
+      if (autoplayButton.textContent === "Resume") {
+        blocked = false;
+        resetAutoplay();
+        autoplayButton.textContent = "Pause";
+      } else {
+        blocked = true;
+        stopAutoplay();
+        autoplayButton.textContent = "Resume";
+      }
     }
   }
   function startAutoplay() {
@@ -39,7 +65,7 @@ function slider(sliderContainer) {
     clearInterval(intervalAutoplay);
   }
   function resetAutoplay() {
-    if (sliderContainer.dataset.autoplay === "true") {
+    if (sliderContainer.dataset.autoplay === "true" && !blocked) {
       stopAutoplay();
       startAutoplay();
     }
@@ -80,6 +106,7 @@ function slider(sliderContainer) {
       ) {
         return;
       }
+      resetAutoplay();
       goToSlide(goInput.value);
     });
   }
@@ -332,6 +359,9 @@ function slider(sliderContainer) {
       enableAutoplay = true;
       if (sliderContainer.dataset.autoplayinterval) {
         autoPlayInterval = parseInt(sliderContainer.dataset.autoplayinterval);
+      }
+      if (sliderContainer.dataset.autoplaybuttons === "true") {
+        enableAutoplayButtons = true;
       }
     }
   }
