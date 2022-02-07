@@ -35,10 +35,10 @@ function slider(sliderContainer) {
       }
     }
   }
+  const autoplayButton = document.createElement("button");
   function autoPlayButtons() {
     const autoplayDiv = document.createElement("div");
     sliderContainer.insertAdjacentElement("afterend", autoplayDiv);
-    const autoplayButton = document.createElement("button");
     autoplayButton.textContent = "Pause";
     autoplayButton.style.marginBottom = "10px";
     autoplayDiv.insertAdjacentElement("afterbegin", autoplayButton);
@@ -68,7 +68,12 @@ function slider(sliderContainer) {
 
     if (enableAutoplay) {
       carouselTrack.addEventListener("mouseenter", pauseAutoplay);
-      carouselTrack.addEventListener("mouseleave", resumeAutoplay);
+      carouselTrack.addEventListener("mouseleave", mouseLeaveHandler);
+    }
+  }
+  function mouseLeaveHandler() {
+    if (autoplayButton.textContent === "Pause") {
+      isAutoplayPaused = false;
     }
   }
   function pauseAutoplay() {
@@ -123,7 +128,10 @@ function slider(sliderContainer) {
       ) {
         return;
       }
-      resetAutoplay();
+
+      if (autoplayButton.textContent === "Pause") {
+        resetAutoplay();
+      }
       goToSlide(goInput.value);
     });
   }
@@ -286,10 +294,14 @@ function slider(sliderContainer) {
       carouselTrack.style.cursor = "grab";
 
       if (start > currPosition) {
-        resetAutoplay();
+        if (autoplayButton.textContent === "Pause") {
+          resetAutoplay();
+        }
         moveSlide("next");
       } else if (start < currPosition) {
-        resetAutoplay();
+        if (autoplayButton.textContent === "Pause") {
+          resetAutoplay();
+        }
         moveSlide("prev");
       }
 
@@ -330,10 +342,14 @@ function slider(sliderContainer) {
     function touchEnd() {
       resumeAutoplay();
       if (start < currPosition) {
-        resetAutoplay();
+        if (autoplayButton.textContent === "Pause") {
+          resetAutoplay();
+        }
         moveSlide("prev");
       } else if (start > currPosition) {
-        resetAutoplay();
+        if (autoplayButton.textContent === "Pause") {
+          resetAutoplay();
+        }
         moveSlide("next");
       }
     }
