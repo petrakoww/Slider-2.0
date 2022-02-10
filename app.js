@@ -6,10 +6,13 @@ function slider(sliderContainer) {
   const slidesInCarousel = [...sliderContainer.children];
   const carouselTrack = document.createElement("div");
 
+  const autoplayButton = document.createElement("button");
+
   let currentSlideIndex = 0,
     transitionSize = 0;
   let slideWidths = [];
   let numberOfElementsInCarousel = slidesInCarousel.length;
+  let numberOfIndexesInCarousel = numberOfElementsInCarousel - 1;
   let start,
     currPosition,
     navigationDots,
@@ -20,13 +23,13 @@ function slider(sliderContainer) {
   let enableAutoplay = false,
     enableAutoplayButtons = false,
     isAutoplayPaused = false;
-  let autoPlayInterval = 5000;
+  let autoPlayInterval = 5000,
+    sliderWidth = 500, sliderheight = 500;
 
   //full width of carousel
   slidesInCarousel.forEach((slide) => {
     slideWidths.push(slide.clientWidth);
   });
-
   function autoplay() {
     if (enableAutoplay) {
       startAutoplay();
@@ -35,7 +38,6 @@ function slider(sliderContainer) {
       }
     }
   }
-  const autoplayButton = document.createElement("button");
   function autoPlayButtons() {
     const autoplayDiv = document.createElement("div");
     sliderContainer.insertAdjacentElement("afterend", autoplayDiv);
@@ -99,7 +101,6 @@ function slider(sliderContainer) {
     slidesInCarousel.forEach((slideContent) => {
       const slideWrapper = document.createElement("div");
       slideWrapper.classList.add("vasko-slide-wrapper");
-      // console.log(slideContent);
       slideWrapper.append(slideContent);
       carouselTrack.appendChild(slideWrapper);
     });
@@ -113,7 +114,7 @@ function slider(sliderContainer) {
     const goInput = document.createElement("input");
     goInput.type = "number";
     goInput.min = "0";
-    goInput.max = numberOfElementsInCarousel - 1;
+    goInput.max = numberOfIndexesInCarousel;
     inputDiv.insertAdjacentElement("afterbegin", goInput);
 
     const goButton = document.createElement("button");
@@ -123,13 +124,13 @@ function slider(sliderContainer) {
     goButton.addEventListener("click", () => {
       if (
         goInput.value < 0 ||
-        goInput.value >= numberOfElementsInCarousel - 1 ||
+        goInput.value > numberOfIndexesInCarousel ||
         goInput.value == ""
       ) {
         return;
       }
 
-      if (autoplayButton.textContent === "Pause") {
+      if (!isAutoplayPaused) {
         resetAutoplay();
       }
       goToSlide(goInput.value);
@@ -141,9 +142,8 @@ function slider(sliderContainer) {
       if (index < slideToGo) {
         transitionSize += slide.clientWidth;
       }
-      // console.log(transitionSize);
     });
-
+    console.log(transitionSize);
     carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
 
     navigationDots.forEach((dot) => {
@@ -154,7 +154,6 @@ function slider(sliderContainer) {
     navigationDots[slideToGo].classList.add("dot-red");
     currentSlideIndex = slideToGo;
     moveToSlide = slideToGo;
-    // console.log(currentSlideIndex, numberOfElementsInCarousel);
   }
   function createNavDots() {
     const dotsContainer = document.createElement("div");
@@ -178,7 +177,9 @@ function slider(sliderContainer) {
       let { id } = e.target;
 
       if (id) {
-        resetAutoplay();
+        if (!isAutoplayPaused) {
+          resetAutoplay();
+        }
         goToSlide(id);
       }
 
@@ -196,7 +197,7 @@ function slider(sliderContainer) {
   }
   function moveSlide(direction = "next") {
     if (direction === "next") {
-      if (currentSlideIndex >= numberOfElementsInCarousel - 1) {
+      if (currentSlideIndex >= numberOfIndexesInCarousel) {
         goToSlide(0);
       } else {
         moveToSlide++;
@@ -204,7 +205,7 @@ function slider(sliderContainer) {
       }
     } else if (direction === "prev") {
       if (currentSlideIndex <= 0) {
-        goToSlide(numberOfElementsInCarousel - 1);
+        goToSlide(numberOfIndexesInCarousel);
       } else {
         moveToSlide--;
         goToSlide(moveToSlide);
@@ -226,10 +227,16 @@ function slider(sliderContainer) {
     sliderContainer.insertAdjacentElement("beforeend", nextButton);
 
     nextButton.addEventListener("click", () => {
+      if (!isAutoplayPaused) {
+        resetAutoplay();
+      }
       moveSlide("next");
     });
 
     prevButton.addEventListener("click", () => {
+      if (!isAutoplayPaused) {
+        resetAutoplay();
+      }
       moveSlide("prev");
     });
   }
@@ -294,12 +301,12 @@ function slider(sliderContainer) {
       carouselTrack.style.cursor = "grab";
 
       if (start > currPosition) {
-        if (autoplayButton.textContent === "Pause") {
+        if (!isAutoplayPaused) {
           resetAutoplay();
         }
         moveSlide("next");
       } else if (start < currPosition) {
-        if (autoplayButton.textContent === "Pause") {
+        if (!isAutoplayPaused) {
           resetAutoplay();
         }
         moveSlide("prev");
@@ -342,12 +349,12 @@ function slider(sliderContainer) {
     function touchEnd() {
       resumeAutoplay();
       if (start < currPosition) {
-        if (autoplayButton.textContent === "Pause") {
+        if (!isAutoplayPaused) {
           resetAutoplay();
         }
         moveSlide("prev");
       } else if (start > currPosition) {
-        if (autoplayButton.textContent === "Pause") {
+        if (!isAutoplayPaused) {
           resetAutoplay();
         }
         moveSlide("next");
@@ -361,6 +368,9 @@ function slider(sliderContainer) {
       buttons();
     }
     if (sliderContainer.dataset.dots === "true") {
+      if (sliderContainer.dataset.startfromindex > numberOfIndexesInCarousel) {
+        sliderContainer.dataset.startfromindex = numberOfIndexesInCarousel;
+      }
       createNavDots(sliderContainer.dataset.startfromindex || 0);
       goToSlide(sliderContainer.dataset.startfromindex || 0);
     }
@@ -380,10 +390,27 @@ function slider(sliderContainer) {
       enableAutoplay = true;
       if (sliderContainer.dataset.autoplayinterval) {
         autoPlayInterval = parseInt(sliderContainer.dataset.autoplayinterval);
+        if (autoPlayInterval <= 1000) {
+          autoPlayInterval = 3000;
+        }
       }
       if (sliderContainer.dataset.autoplaybuttons === "true") {
         enableAutoplayButtons = true;
       }
+    }
+    if (sliderContainer.dataset.sliderwidth) {
+      sliderWidth = parseInt(sliderContainer.dataset.sliderwidth);
+      if (sliderWidth <= 0) {
+        sliderWidth = 500;
+      }
+      carouselTrack.style.width = `${sliderWidth}px`;
+    }
+    if (sliderContainer.dataset.sliderheight) {
+      sliderheight = parseInt(sliderContainer.dataset.sliderheight);
+      if (sliderheight <= 0) {
+        sliderheight = 500;
+      }
+      carouselTrack.style.height = `${sliderheight}px`;
     }
   }
   wrapEl();
