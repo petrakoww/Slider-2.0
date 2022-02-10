@@ -24,7 +24,8 @@ function slider(sliderContainer) {
     enableAutoplayButtons = false,
     isAutoplayPaused = false;
   let autoPlayInterval = 5000,
-    sliderWidth = 500, sliderheight = 500;
+    sliderWidth = 500,
+    sliderheight = 500;
 
   //full width of carousel
   slidesInCarousel.forEach((slide) => {
@@ -143,7 +144,7 @@ function slider(sliderContainer) {
         transitionSize += slide.clientWidth;
       }
     });
-    console.log(transitionSize);
+    // console.log(transitionSize);
     carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
 
     navigationDots.forEach((dot) => {
@@ -273,19 +274,20 @@ function slider(sliderContainer) {
       e.preventDefault();
       currPosition = e.offsetX;
 
-      if (start > 250) {
+      let adjust = sliderContainer.getBoundingClientRect().x;
+
+      if (start > slideWidths[currentSlideIndex] / 2) {
         carouselTrack.style.transform =
           "translateX(" +
           (-slideWidths[currentSlideIndex] * currentSlideIndex -
-            500 -
-            (500 - e.clientX)) +
+            adjust -
+            (slideWidths[currentSlideIndex] - e.clientX)) +
           "px)";
       } else {
         carouselTrack.style.transform =
           "translateX(" +
-          (-slideWidths[currentSlideIndex] * currentSlideIndex +
-            250 -
-            (750 - e.clientX)) +
+          (-slideWidths[currentSlideIndex] * currentSlideIndex -
+            (adjust - e.clientX)) +
           "px)";
       }
 
@@ -333,15 +335,21 @@ function slider(sliderContainer) {
 
     function touchMove(e) {
       currPosition = e.touches[0].clientX;
-      if (start > 470) {
+      let adjust = sliderContainer.getBoundingClientRect().x;
+      let move = start - adjust;
+      console.log(move);
+
+      if (move > slideWidths[currentSlideIndex] / 2) {
         carouselTrack.style.transform =
           "translateX(" +
-          (-transitionSize + e.touches[0].clientX - 740) +
+          (-transitionSize +
+            e.touches[0].clientX -
+            (slideWidths[currentSlideIndex] + adjust)) +
           "px)";
       } else {
         carouselTrack.style.transform =
           "translateX(" +
-          (-transitionSize + e.touches[0].clientX - 250) +
+          (-transitionSize + e.touches[0].clientX - adjust) +
           "px)";
       }
     }
@@ -391,7 +399,7 @@ function slider(sliderContainer) {
       if (sliderContainer.dataset.autoplayinterval) {
         autoPlayInterval = parseInt(sliderContainer.dataset.autoplayinterval);
         if (autoPlayInterval <= 1000) {
-          autoPlayInterval = 3000;
+          autoPlayInterval = 5000;
         }
       }
       if (sliderContainer.dataset.autoplaybuttons === "true") {
