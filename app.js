@@ -252,7 +252,7 @@ function slider(sliderContainer) {
   }
   function draggable() {
     let pressed = false;
-
+    
     carouselTrack.addEventListener("click", sliderClick);
     carouselTrack.addEventListener("mousedown", sliderMouseDown);
     carouselTrack.addEventListener("mouseenter", sliderMouseEnter);
@@ -274,20 +274,20 @@ function slider(sliderContainer) {
       e.preventDefault();
       currPosition = e.offsetX;
 
-      let adjust = sliderContainer.getBoundingClientRect().x;
+      let leftClientBorderToSlider = sliderContainer.getBoundingClientRect().x;
 
       if (start > slideWidths[currentSlideIndex] / 2) {
         carouselTrack.style.transform =
           "translateX(" +
           (-slideWidths[currentSlideIndex] * currentSlideIndex -
-            adjust -
+            leftClientBorderToSlider -
             (slideWidths[currentSlideIndex] - e.clientX)) +
           "px)";
       } else {
         carouselTrack.style.transform =
           "translateX(" +
           (-slideWidths[currentSlideIndex] * currentSlideIndex -
-            (adjust - e.clientX)) +
+            (leftClientBorderToSlider - e.clientX)) +
           "px)";
       }
 
