@@ -10,16 +10,18 @@ function slider(sliderContainer) {
 
   let currentSlideIndex = 0,
     transitionSize = 0;
-  let slideWidths = [];
+  let slideWidths = [],
+    slideHeights = [];
   let numberOfElementsInCarousel = slidesInCarousel.length;
   let numberOfIndexesInCarousel = numberOfElementsInCarousel - 1;
-  let start,
+  let startPosition,
     currPosition,
     navigationDots,
     dot,
     moveToSlide,
     startIntervalAutoplay,
-    timeRemaining;
+    timeRemaining,
+    leftClientBorderToSlider;
   let enableAutoplay = false,
     enableAutoplayButtons = false,
     isAutoplayPaused = false;
@@ -31,6 +33,14 @@ function slider(sliderContainer) {
   slidesInCarousel.forEach((slide) => {
     slideWidths.push(slide.clientWidth);
   });
+  slidesInCarousel.forEach((slide) => {
+    slideHeights.push(slide.clientHeight);
+  });
+  function resizeSlider() {
+    // // currentSlideIndex++;
+    carouselTrack.style.width = `${slideWidths[moveToSlide]}px`;
+    carouselTrack.style.height = `${slideHeights[moveToSlide]}px`;
+  }
   function autoplay() {
     if (enableAutoplay) {
       startAutoplay();
@@ -144,7 +154,6 @@ function slider(sliderContainer) {
         transitionSize += slide.clientWidth;
       }
     });
-    // console.log(transitionSize);
     carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
 
     navigationDots.forEach((dot) => {
@@ -155,6 +164,7 @@ function slider(sliderContainer) {
     navigationDots[slideToGo].classList.add("dot-red");
     currentSlideIndex = slideToGo;
     moveToSlide = slideToGo;
+    resizeSlider();
   }
   function createNavDots() {
     const dotsContainer = document.createElement("div");
@@ -252,7 +262,7 @@ function slider(sliderContainer) {
   }
   function draggable() {
     let pressed = false;
-    
+
     carouselTrack.addEventListener("click", sliderClick);
     carouselTrack.addEventListener("mousedown", sliderMouseDown);
     carouselTrack.addEventListener("mouseenter", sliderMouseEnter);
@@ -264,30 +274,29 @@ function slider(sliderContainer) {
     function sliderMouseDown(e) {
       pressed = true;
       carouselTrack.style.cursor = "grabbing";
-      start = e.offsetX;
       carouselTrack.addEventListener("mousemove", sliderMouseMove);
-    }
 
+      currPosition = sliderContainer.getBoundingClientRect().x + e.clientX;
+    }
     function sliderMouseMove(e) {
       pressed = true;
       carouselTrack.style.cursor = "grabbing";
       e.preventDefault();
-      currPosition = e.offsetX;
 
-      let leftClientBorderToSlider = sliderContainer.getBoundingClientRect().x;
+      leftClientBorderToSlider = sliderContainer.getBoundingClientRect().x;
 
-      if (start > slideWidths[currentSlideIndex] / 2) {
+      startPosition = sliderContainer.getBoundingClientRect().x + e.clientX;
+      if (startPosition < currPosition) {
         carouselTrack.style.transform =
           "translateX(" +
-          (-slideWidths[currentSlideIndex] * currentSlideIndex -
+          (-transitionSize -
             leftClientBorderToSlider -
             (slideWidths[currentSlideIndex] - e.clientX)) +
           "px)";
       } else {
         carouselTrack.style.transform =
           "translateX(" +
-          (-slideWidths[currentSlideIndex] * currentSlideIndex -
-            (leftClientBorderToSlider - e.clientX)) +
+          (-transitionSize - (leftClientBorderToSlider - e.clientX)) +
           "px)";
       }
 
@@ -302,16 +311,27 @@ function slider(sliderContainer) {
       pressed = false;
       carouselTrack.style.cursor = "grab";
 
-      if (start > currPosition) {
+      if (
+        (startPosition - currPosition < 100 &&
+          startPosition - currPosition > 0) ||
+        (currPosition - startPosition > 0 && currPosition - startPosition < 100)
+      ) {
         if (!isAutoplayPaused) {
           resetAutoplay();
         }
-        moveSlide("next");
-      } else if (start < currPosition) {
-        if (!isAutoplayPaused) {
-          resetAutoplay();
+        carouselTrack.style.transform = "translateX(" + -transitionSize + "px)";
+      } else {
+        if (startPosition < currPosition) {
+          if (!isAutoplayPaused) {
+            resetAutoplay();
+          }
+          moveSlide("next");
+        } else if (startPosition > currPosition) {
+          if (!isAutoplayPaused) {
+            resetAutoplay();
+          }
+          moveSlide("prev");
         }
-        moveSlide("prev");
       }
 
       carouselTrack.removeEventListener("mousemove", sliderMouseMove);
@@ -329,39 +349,39 @@ function slider(sliderContainer) {
     carouselTrack.addEventListener("touchend", touchEnd);
 
     function touchStart(e) {
-      start = e.touches[0].clientX;
+      startPosition =
+        sliderContainer.getBoundingClientRect().x + e.touches[0].clientX;
+
       stopAutoplay();
     }
-
     function touchMove(e) {
-      currPosition = e.touches[0].clientX;
-      let adjust = sliderContainer.getBoundingClientRect().x;
-      let move = start - adjust;
-      console.log(move);
+      leftClientBorderToSlider = sliderContainer.getBoundingClientRect().x;
+      currPosition =
+        sliderContainer.getBoundingClientRect().x + e.touches[0].clientX;
 
-      if (move > slideWidths[currentSlideIndex] / 2) {
+      if (startPosition > currPosition) {
         carouselTrack.style.transform =
           "translateX(" +
-          (-transitionSize +
-            e.touches[0].clientX -
-            (slideWidths[currentSlideIndex] + adjust)) +
+          (-transitionSize -
+            leftClientBorderToSlider -
+            (slideWidths[currentSlideIndex] - e.touches[0].clientX)) +
           "px)";
       } else {
         carouselTrack.style.transform =
           "translateX(" +
-          (-transitionSize + e.touches[0].clientX - adjust) +
+          (-transitionSize -
+            (leftClientBorderToSlider - e.touches[0].clientX)) +
           "px)";
       }
     }
-
     function touchEnd() {
       resumeAutoplay();
-      if (start < currPosition) {
+      if (startPosition < currPosition) {
         if (!isAutoplayPaused) {
           resetAutoplay();
         }
         moveSlide("prev");
-      } else if (start > currPosition) {
+      } else if (startPosition > currPosition) {
         if (!isAutoplayPaused) {
           resetAutoplay();
         }
@@ -424,6 +444,8 @@ function slider(sliderContainer) {
   wrapEl();
   dataSets();
   autoplay();
+
+  resizeSlider();
 }
 
 const sliders = document.querySelectorAll(".carousel-container");
