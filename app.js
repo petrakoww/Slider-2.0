@@ -18,7 +18,6 @@ function slider(sliderContainer) {
     currPosition,
     navigationDots,
     dot,
-    moveToSlide,
     startIntervalAutoplay,
     timeRemaining,
     leftClientBorderToSlider,
@@ -34,16 +33,30 @@ function slider(sliderContainer) {
     slideHeights.push(slide.clientHeight);
   });
   function resizeSlider() {
-    carouselTrack.style.width = `${slideWidths[moveToSlide]}px`;
-    carouselTrack.style.height = `${slideHeights[moveToSlide]}px`;
+    if (slideHeights[currentSlideIndex] < 200) {
+      slideHeights[currentSlideIndex] = 200;
+    }
 
-    slidesInCarousel.forEach((slide, index) => {
-      if (slide.clientHeight < 200 || slide.clientWidth < 200) {
-        slideHeights[index] = 200;
-        slidesInCarousel[index].style.width = "180px";
-        // slidesInCarousel[index].style.height="200px";
-      }
-    });
+    const wrappedEls = [
+      ...carouselTrack.querySelectorAll(".vasko-slide-wrapper"),
+    ];
+    wrappedEls[
+      currentSlideIndex
+    ].childNodes[0].style.width = `${slideWidths[currentSlideIndex]}px`;
+    wrappedEls[
+      currentSlideIndex
+    ].childNodes[0].style.height = `${slideHeights[currentSlideIndex]}px`;
+
+    carouselTrack.style.width = `${slideWidths[currentSlideIndex]}px`;
+    carouselTrack.style.height = `${slideHeights[currentSlideIndex]}px`;
+
+    // slidesInCarousel.forEach((slide, index) => {
+    //   if (slide.clientHeight < 200 || slide.clientWidth < 200) {
+    //     slideHeights[index] = 200;
+    //     slidesInCarousel[index].style.width = "180px";
+    //     // slidesInCarousel[index].style.height="200px";
+    //   }
+    // });
   }
   function autoplay() {
     if (enableAutoplay) {
@@ -167,7 +180,6 @@ function slider(sliderContainer) {
     });
     navigationDots[slideToGo].classList.add("dot-red");
     currentSlideIndex = slideToGo;
-    moveToSlide = slideToGo;
     resizeSlider();
   }
   function createNavDots() {
@@ -215,15 +227,15 @@ function slider(sliderContainer) {
       if (currentSlideIndex >= numberOfIndexesInCarousel) {
         goToSlide(0);
       } else {
-        moveToSlide++;
-        goToSlide(moveToSlide);
+        currentSlideIndex++;
+        goToSlide(currentSlideIndex);
       }
     } else if (direction === "prev") {
       if (currentSlideIndex <= 0) {
         goToSlide(numberOfIndexesInCarousel);
       } else {
-        moveToSlide--;
-        goToSlide(moveToSlide);
+        currentSlideIndex--;
+        goToSlide(currentSlideIndex);
       }
     }
   }
