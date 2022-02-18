@@ -40,6 +40,7 @@ function slider(sliderContainer) {
     const wrappedEls = [
       ...carouselTrack.querySelectorAll(".vasko-slide-wrapper"),
     ];
+  
     wrappedEls[
       currentSlideIndex
     ].childNodes[0].style.width = `${slideWidths[currentSlideIndex]}px`;
@@ -125,13 +126,37 @@ function slider(sliderContainer) {
 
   function wrapEl() {
     carouselTrack.classList.add("carousel-track");
-
+    // let slideWrapper
     slidesInCarousel.forEach((slideContent) => {
       const slideWrapper = document.createElement("div");
       slideWrapper.classList.add("vasko-slide-wrapper");
       slideWrapper.append(slideContent);
       carouselTrack.appendChild(slideWrapper);
     });
+
+    //
+    function smoothSlider(){
+    const lastDiv = document.createElement("div");
+    lastDiv.classList.add("lastClone");
+    const firstDiv = document.createElement("div");
+    firstDiv.classList.add("firstClone");
+    
+
+    let selectFirstEl = carouselTrack.firstChild.firstChild;
+    let selectLastEl = carouselTrack.lastChild.lastChild;
+
+    let lastEL = selectFirstEl.cloneNode(true);
+    let firstEl = selectLastEl.cloneNode(true);
+
+    
+    lastDiv.append(lastEL)
+    firstDiv.append(firstEl)
+    
+    carouselTrack.insertAdjacentElement("afterbegin",firstDiv)
+    carouselTrack.insertAdjacentElement("beforeend",lastDiv)
+  }
+  //
+  // smoothSlider();
 
     sliderContainer.appendChild(carouselTrack);
   }
@@ -172,20 +197,23 @@ function slider(sliderContainer) {
       }
     });
     carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
+    
+    if (sliderContainer.dataset.dots === "true") {
+      navigationDots.forEach((dot) => {
+        if (dot.classList.contains("dot-red")) {
+          dot.classList.remove("dot-red");
+        }
+      });
+      navigationDots[slideToGo].classList.add("dot-red");
+    }
 
-    navigationDots.forEach((dot) => {
-      if (dot.classList.contains("dot-red")) {
-        dot.classList.remove("dot-red");
-      }
-    });
-    navigationDots[slideToGo].classList.add("dot-red");
     currentSlideIndex = slideToGo;
     resizeSlider();
   }
   function createNavDots() {
     const dotsContainer = document.createElement("div");
-    dotsContainer.classList.add("alignCenter");
-    sliderContainer.insertAdjacentElement("beforeend", dotsContainer);
+    dotsContainer.classList.add("dotsContainer");
+    sliderContainer.appendChild(dotsContainer);
 
     slideWidths.forEach((el, index) => {
       dot = document.createElement("button");
@@ -242,16 +270,20 @@ function slider(sliderContainer) {
   function buttons() {
     //create prev and next button dynamically
     //prev
+    const buttonsContainer = document.createElement("div");
+    buttonsContainer.classList.add("buttonsContainer");
+    sliderContainer.appendChild(buttonsContainer);
+    
+    
     const prevButton = document.createElement("button");
     prevButton.textContent = "Prev";
-    prevButton.classList.add("prevBtn");
-    sliderContainer.insertAdjacentElement("afterbegin", prevButton);
+    buttonsContainer.appendChild(prevButton);
 
     //next
     const nextButton = document.createElement("button");
     nextButton.textContent = "Next";
-    nextButton.classList.add("nextBtn");
-    sliderContainer.insertAdjacentElement("beforeend", nextButton);
+    buttonsContainer.appendChild(nextButton);
+
 
     nextButton.addEventListener("click", () => {
       if (!isAutoplayPaused) {

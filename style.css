@@ -11,20 +11,14 @@ body {
   flex-wrap: wrap;
 }
 
-.prevBtn {
+.buttonsContainer{
   position: absolute;
+  display: flex;
+  justify-content: space-between;
+  top: 50%;
+  transform: translateY(-50%);
   left: 0;
-  bottom: 50%;
-  z-index: 1;
-  padding: revert;
-}
-
-.nextBtn {
-  position: absolute;
   right: 0;
-  bottom: 50%;
-  z-index: 1;
-  padding: revert;
 }
 
 .carousel-container {
@@ -34,6 +28,7 @@ body {
   border: solid 5px black;
   position: relative;
   margin-bottom: 25px;
+  display: inline-block;
 }
 
 .carousel-track {
@@ -57,8 +52,11 @@ body {
   background-color: red;
 }
 
-.alignCenter {
+.dotsContainer {
   display: flex;
-  justify-content: center;
-  margin-bottom: 1%;
+
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
