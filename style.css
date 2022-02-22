@@ -1,7 +1,6 @@
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 body {
@@ -11,29 +10,43 @@ body {
   flex-wrap: wrap;
 }
 
+.carousel-container {
+  position: relative;
+  /* margin: auto; */
+  padding: 0 0px 20px 0px;
+  /* overflow: hidden; */
+  border: solid 5px black;
+
+  width: 750px;
+}
+
+
+.carousel-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  transition: transform 0.4s ease-in-out;
+  /* remove transition prop from js */
+  /* smooth height resize */
+}
+
 .buttonsContainer{
   position: absolute;
   display: flex;
   justify-content: space-between;
   top: 50%;
   transform: translateY(-50%);
-  left: 0;
-  right: 0;
+  left: -37px;
+  right: -37px;
 }
 
-.carousel-container {
-  margin: auto;
-  overflow: hidden;
-  box-sizing: content-box;
-  border: solid 5px black;
-  position: relative;
-  margin-bottom: 25px;
-  display: inline-block;
-}
-
-.carousel-track {
+.dotsContainer {
   display: flex;
-  transition: transform 0.4s ease-in-out;
+
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .dot {
@@ -50,13 +63,4 @@ body {
 
 .dot-red {
   background-color: red;
-}
-
-.dotsContainer {
-  display: flex;
-
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
 }

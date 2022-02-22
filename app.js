@@ -5,6 +5,10 @@ function slider(sliderContainer) {
 
   const slidesInCarousel = [...sliderContainer.children];
   const carouselTrack = document.createElement("div");
+  const overflowHidden = document.createElement("div");
+  sliderContainer.insertAdjacentElement("afterbegin", overflowHidden)
+  overflowHidden.style.overflow = "hidden";
+  const asd = [...carouselTrack.children];
 
   const autoplayButton = document.createElement("button");
 
@@ -26,13 +30,21 @@ function slider(sliderContainer) {
     isAutoplayPaused = false,
     autoPlayInterval = 5000;
 
-  //full width of carousel
-  slidesInCarousel.forEach((slide) => {
-    slide.style.display = "inline-block";
-    slideWidths.push(slide.clientWidth);
-    slideHeights.push(slide.clientHeight);
-  });
-  let originalSlidesInCarousel = [...slidesInCarousel];
+let containerWidth = sliderContainer.clientWidth;
+
+
+//full width of carousel
+slidesInCarousel.forEach((slide,index) => {
+  
+  slideWidths.push(slide.clientWidth);
+  slideHeights.push(slide.clientHeight);
+});
+console.log(asd);
+
+console.log(sliderContainer.style.paddingRight);
+carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*numberOfElementsInCarousel)}px`;
+  
+
   function resizeSlider() {
     // if (slideHeights[currentSlideIndex] < 200) {
     //   slideHeights[currentSlideIndex] = 200;
@@ -49,16 +61,22 @@ function slider(sliderContainer) {
     //   currentSlideIndex
     // ].childNodes[0].style.height = `${slideHeights[currentSlideIndex]}px`;
 
-    carouselTrack.style.width = `${slideWidths[currentSlideIndex]}px`;
-    carouselTrack.style.height = `${slideHeights[currentSlideIndex]}px`;
-
+    // carouselTrack.style.width = `${slideWidths[currentSlideIndex]}px`;
+    // carouselTrack.style.height = `${slideHeights[currentSlideIndex]}px`;
     slidesInCarousel.forEach((slide, index) => {
-      if (slide.clientHeight < 200 || slide.clientWidth < 200) {
-        slideHeights[index] = 200;
-        slidesInCarousel[index].style.width = "180px";
-        // slidesInCarousel[index].style.height="200px";
-      }
+
+        // slidesInCarousel[index].style.width = `${asd-80}px`;
+        // carouselTrack.style.width = `${asd-80}px`;
+        
+
+
     });
+
+
+
+    window.addEventListener("resize", ()=>{
+      // carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*numberOfElementsInCarousel)}px`;
+    })
   }
   function autoplay() {
     if (enableAutoplay) {
@@ -131,6 +149,14 @@ function slider(sliderContainer) {
     slidesInCarousel.forEach((slideContent) => {
       const slideWrapper = document.createElement("div");
       slideWrapper.classList.add("vasko-slide-wrapper");
+      slideWrapper.style.width = `${containerWidth}px`
+      // slideWrapper.style.marginRight = `${40}px`
+ 
+      // margin-right: 80px;
+
+      
+      
+      
       slideWrapper.append(slideContent);
       carouselTrack.appendChild(slideWrapper);
     });
@@ -163,13 +189,14 @@ function slider(sliderContainer) {
     slideHeights.push(lastEL.height);
 
   }
-  smoothSlider();
+  // smoothSlider();
   ///
 
-    sliderContainer.appendChild(carouselTrack);
+    overflowHidden.appendChild(carouselTrack);
   }
   function InputDiv() {
     const inputDiv = document.createElement("div");
+    inputDiv.style.marginTop = "25px";
     sliderContainer.insertAdjacentElement("afterend", inputDiv);
 
     const goInput = document.createElement("input");
@@ -202,9 +229,11 @@ function slider(sliderContainer) {
     transitionSize = 0;
     slidesInCarousel.forEach((slide, index) => {
       if (index < slideToGo) {
-        transitionSize += slide.clientWidth;
+        console.log(transitionSize);
+        transitionSize += containerWidth;
       }
     });
+    console.log(transitionSize);
     carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
     
     if (sliderContainer.dataset.dots === "true") {
@@ -213,6 +242,7 @@ function slider(sliderContainer) {
           dot.classList.remove("dot-red");
         }
       });
+      // console.log(slideToGo);
       navigationDots[slideToGo].classList.add("dot-red");
     }
 
@@ -263,12 +293,13 @@ function slider(sliderContainer) {
   function moveSlide(direction = "next") {
     if (direction === "next") {
 
-      if (currentSlideIndex === numberOfElementsInCarousel) {
-        carouselTrack.style.transition= "none";
-        goToSlide(0);
-      }
+      // if (currentSlideIndex === numberOfElementsInCarousel) {
+      //   carouselTrack.style.transition= "none";
+      //   goToSlide(0);
+      // }
 
-      if (currentSlideIndex > numberOfIndexesInCarousel) {
+      console.log(currentSlideIndex,numberOfElementsInCarousel);
+      if (currentSlideIndex >= numberOfIndexesInCarousel) {
         goToSlide(0);
       } else {
         carouselTrack.style.transition= "transform 0.4s ease-in-out";
@@ -276,8 +307,8 @@ function slider(sliderContainer) {
         goToSlide(currentSlideIndex);
       }
     } else if (direction === "prev") {
-      if (currentSlideIndex <= 1) {
-        goToSlide(numberOfIndexesInCarousel+1);
+      if (currentSlideIndex <= 0) {
+        goToSlide(numberOfIndexesInCarousel);
       } else {
         currentSlideIndex--;
         goToSlide(currentSlideIndex);
@@ -510,10 +541,11 @@ function slider(sliderContainer) {
   autoplay();
 
   resizeSlider();
-}
 
+}
 const sliders = document.querySelectorAll(".carousel-container");
 
 sliders.forEach((slide) => {
   slider(slide);
 });
+//add padding to transition
