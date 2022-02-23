@@ -62,19 +62,19 @@ function slider(sliderContainer) {
 
     // carouselTrack.style.width = `${slideWidths[currentSlideIndex]}px`;
     // carouselTrack.style.height = `${slideHeights[currentSlideIndex]}px`;
-    slidesInCarousel.forEach((slide, index) => {
-      // slidesInCarousel[index].style.width = `${asd-80}px`;
-      // carouselTrack.style.width = `${asd-80}px`;
-    });
+    // slidesInCarousel.forEach((slide, index) => {
+    // slidesInCarousel[index].style.width = `${asd-80}px`;
+    // carouselTrack.style.width = `${asd-80}px`;
+    // });
 
     window.addEventListener("resize", () => {
-      containerWidth = 100;
-      carouselTrack.style.width = `${
-        containerWidth * numberOfElementsInCarousel +
-        40 * numberOfElementsInCarousel
-      }px`;
-      console.log(window.innerWidth);
-      console.log(window.innerHeight);
+      // containerWidth = 100;
+      // carouselTrack.style.width = `${
+      //   containerWidth * numberOfElementsInCarousel +
+      //   40 * numberOfElementsInCarousel
+      // }px`;
+      // console.log(window.innerWidth);
+      // console.log(window.innerHeight);
     });
   }
   function autoplay() {
@@ -225,11 +225,9 @@ function slider(sliderContainer) {
     transitionSize = 0;
     slidesInCarousel.forEach((slide, index) => {
       if (index < slideToGo) {
-        // console.log(transitionSize);
         transitionSize += containerWidth;
       }
     });
-    // console.log(transitionSize);
     carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
 
     if (sliderContainer.dataset.dots === "true") {
@@ -238,12 +236,10 @@ function slider(sliderContainer) {
           dot.classList.remove("dot-red");
         }
       });
-      // console.log(slideToGo);
       navigationDots[slideToGo].classList.add("dot-red");
     }
 
     currentSlideIndex = slideToGo;
-    console.log(currentSlideIndex);
     resizeSlider();
   }
   function createNavDots() {
@@ -258,7 +254,8 @@ function slider(sliderContainer) {
       dot.id = index;
       dotsContainer.appendChild(dot);
     });
-    dotsContainer.childNodes[numberOfElementsInCarousel+1].style.display = "none";
+    dotsContainer.childNodes[numberOfElementsInCarousel + 1].style.display =
+      "none";
     dotsContainer.childNodes[0].style.display = "none";
 
     //active button
@@ -288,28 +285,40 @@ function slider(sliderContainer) {
       }
     });
   }
-  carouselTrack.addEventListener("transitionend", () => {
+  function dsa() {
     if (currentSlideIndex === numberOfElementsInCarousel + 1) {
       carouselTrack.style.transition = "none";
       goToSlide(1);
     }
     if (currentSlideIndex === 0) {
       carouselTrack.style.transition = "none";
-      goToSlide(7);
+      goToSlide(numberOfElementsInCarousel);
     }
-    console.log("end");
-  });
+  }
   function moveSlide(direction = "next") {
     if (direction === "next") {
-      currentSlideIndex++;
-/////////////////////////////////////////////////////////////////////////////////////currentSlideIndedx can get bigger than elements in carousel
-      carouselTrack.style.transition = "transform 0.4s ease-in-out";
-      goToSlide(currentSlideIndex);
+      if (currentSlideIndex > numberOfIndexesInCarousel + 1) {
+        carouselTrack.addEventListener("transitionend", dsa);
+      } else {
+        carouselTrack.style.transition = "transform 0.4s ease-in-out";
+        currentSlideIndex++;
+        goToSlide(currentSlideIndex);
+      }
+      // currentSlideIndex++;
+      // carouselTrack.style.transition = "transform 0.4s ease-in-out";
+      // goToSlide(currentSlideIndex);
     } else if (direction === "prev") {
-      carouselTrack.style.transition = "transform 0.4s ease-in-out";
+      // carouselTrack.style.transition = "transform 0.4s ease-in-out";
+      // currentSlideIndex--;
+      // goToSlide(currentSlideIndex);
 
-      currentSlideIndex--;
-      goToSlide(currentSlideIndex);
+      if (currentSlideIndex < 1) {
+        carouselTrack.addEventListener("transitionend", dsa);
+      } else {
+        carouselTrack.style.transition = "transform 0.4s ease-in-out";
+        currentSlideIndex--;
+        goToSlide(currentSlideIndex);
+      }
     }
   }
 
