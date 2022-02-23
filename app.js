@@ -6,7 +6,7 @@ function slider(sliderContainer) {
   const slidesInCarousel = [...sliderContainer.children];
   const carouselTrack = document.createElement("div");
   const overflowHidden = document.createElement("div");
-  sliderContainer.insertAdjacentElement("afterbegin", overflowHidden)
+  sliderContainer.insertAdjacentElement("afterbegin", overflowHidden);
   overflowHidden.style.overflow = "hidden";
   const asd = [...carouselTrack.children];
 
@@ -30,20 +30,19 @@ function slider(sliderContainer) {
     isAutoplayPaused = false,
     autoPlayInterval = 5000;
 
-let containerWidth = sliderContainer.clientWidth;
+  let containerWidth = sliderContainer.clientWidth;
 
+  //full width of carousel
+  slidesInCarousel.forEach((slide, index) => {
+    slideWidths.push(slide.clientWidth);
+    slideHeights.push(slide.clientHeight);
+  });
 
-//full width of carousel
-slidesInCarousel.forEach((slide,index) => {
-  
-  slideWidths.push(slide.clientWidth);
-  slideHeights.push(slide.clientHeight);
-});
-console.log(asd);
-
-console.log(sliderContainer.style.paddingRight);
-carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*numberOfElementsInCarousel)}px`;
-  
+  carouselTrack.style.width = `${
+    containerWidth * numberOfElementsInCarousel +
+    40 * numberOfElementsInCarousel +
+    2 * containerWidth
+  }px`;
 
   function resizeSlider() {
     // if (slideHeights[currentSlideIndex] < 200) {
@@ -53,7 +52,7 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
     // const wrappedEls = [
     //   ...carouselTrack.querySelectorAll(".vasko-slide-wrapper"),
     // ];
-  
+
     // wrappedEls[
     //   currentSlideIndex
     // ].childNodes[0].style.width = `${slideWidths[currentSlideIndex]}px`;
@@ -64,19 +63,19 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
     // carouselTrack.style.width = `${slideWidths[currentSlideIndex]}px`;
     // carouselTrack.style.height = `${slideHeights[currentSlideIndex]}px`;
     slidesInCarousel.forEach((slide, index) => {
-
-        // slidesInCarousel[index].style.width = `${asd-80}px`;
-        // carouselTrack.style.width = `${asd-80}px`;
-        
-
-
+      // slidesInCarousel[index].style.width = `${asd-80}px`;
+      // carouselTrack.style.width = `${asd-80}px`;
     });
 
-
-
-    window.addEventListener("resize", ()=>{
-      // carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*numberOfElementsInCarousel)}px`;
-    })
+    window.addEventListener("resize", () => {
+      containerWidth = 100;
+      carouselTrack.style.width = `${
+        containerWidth * numberOfElementsInCarousel +
+        40 * numberOfElementsInCarousel
+      }px`;
+      console.log(window.innerWidth);
+      console.log(window.innerHeight);
+    });
   }
   function autoplay() {
     if (enableAutoplay) {
@@ -149,48 +148,46 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
     slidesInCarousel.forEach((slideContent) => {
       const slideWrapper = document.createElement("div");
       slideWrapper.classList.add("vasko-slide-wrapper");
-      slideWrapper.style.width = `${containerWidth}px`
+      slideWrapper.style.width = `${containerWidth}px`;
       // slideWrapper.style.marginRight = `${40}px`
- 
+
       // margin-right: 80px;
 
-      
-      
-      
       slideWrapper.append(slideContent);
       carouselTrack.appendChild(slideWrapper);
     });
 
     ///
-    function smoothSlider(){
-    const lastDiv = document.createElement("div");
-    lastDiv.classList.add("lastClone");
-    const firstDiv = document.createElement("div");
-    firstDiv.classList.add("firstClone");
-    
-    let selectFirstEl = carouselTrack.firstChild.firstChild;
-    let selectLastEl = carouselTrack.lastChild.lastChild;
+    function smoothSlider() {
+      const lastDiv = document.createElement("div");
+      lastDiv.classList.add("lastClone");
+      lastDiv.style.width = `${containerWidth}px`;
+      const firstDiv = document.createElement("div");
+      firstDiv.classList.add("firstClone");
+      firstDiv.style.width = `${containerWidth}px`;
 
-    let lastEL = selectFirstEl.cloneNode(true);
-    let firstEl = selectLastEl.cloneNode(true);
+      let selectFirstEl = carouselTrack.firstChild.firstChild;
+      let selectLastEl = carouselTrack.lastChild.lastChild;
 
-    lastDiv.append(lastEL)
-    firstDiv.append(firstEl)
-    
-    carouselTrack.insertAdjacentElement("afterbegin",firstDiv)
-    carouselTrack.insertAdjacentElement("beforeend",lastDiv)
+      let lastEL = selectFirstEl.cloneNode(true);
+      let firstEl = selectLastEl.cloneNode(true);
 
-    slidesInCarousel.push(lastEL)
-    slidesInCarousel.splice(0,0,firstEl)
+      lastDiv.append(lastEL);
+      firstDiv.append(firstEl);
 
-    slideWidths.splice(0,0,slideWidths[slideWidths.length-1]);
-    slideHeights.splice(0,0,slideHeights[slideHeights.length-1]);
-    slideWidths.push(lastEL.width);
-    slideHeights.push(lastEL.height);
+      carouselTrack.insertAdjacentElement("afterbegin", firstDiv);
+      carouselTrack.insertAdjacentElement("beforeend", lastDiv);
 
-  }
-  // smoothSlider();
-  ///
+      slidesInCarousel.push(lastEL);
+      slidesInCarousel.splice(0, 0, firstEl);
+
+      slideWidths.splice(0, 0, slideWidths[slideWidths.length - 1]);
+      slideHeights.splice(0, 0, slideHeights[slideHeights.length - 1]);
+      slideWidths.push(lastEL.width);
+      slideHeights.push(lastEL.height);
+    }
+    smoothSlider();
+    ///
 
     overflowHidden.appendChild(carouselTrack);
   }
@@ -202,7 +199,7 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
     const goInput = document.createElement("input");
     goInput.type = "number";
     goInput.min = "1";
-    goInput.max = numberOfIndexesInCarousel+1;
+    goInput.max = numberOfIndexesInCarousel + 1;
     inputDiv.insertAdjacentElement("afterbegin", goInput);
 
     const goButton = document.createElement("button");
@@ -225,17 +222,16 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
     });
   }
   function goToSlide(slideToGo) {
-
     transitionSize = 0;
     slidesInCarousel.forEach((slide, index) => {
       if (index < slideToGo) {
-        console.log(transitionSize);
+        // console.log(transitionSize);
         transitionSize += containerWidth;
       }
     });
-    console.log(transitionSize);
+    // console.log(transitionSize);
     carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
-    
+
     if (sliderContainer.dataset.dots === "true") {
       navigationDots.forEach((dot) => {
         if (dot.classList.contains("dot-red")) {
@@ -247,6 +243,7 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
     }
 
     currentSlideIndex = slideToGo;
+    console.log(currentSlideIndex);
     resizeSlider();
   }
   function createNavDots() {
@@ -261,7 +258,8 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
       dot.id = index;
       dotsContainer.appendChild(dot);
     });
-
+    dotsContainer.childNodes[numberOfElementsInCarousel+1].style.display = "none";
+    dotsContainer.childNodes[0].style.display = "none";
 
     //active button
     navigationDots = sliderContainer.querySelectorAll(".dot");
@@ -270,7 +268,7 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
       transitionSize = 0;
 
       let { id } = e.target;
-      
+
       if (id) {
         if (!isAutoplayPaused) {
           resetAutoplay();
@@ -290,39 +288,38 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
       }
     });
   }
+  carouselTrack.addEventListener("transitionend", () => {
+    if (currentSlideIndex === numberOfElementsInCarousel + 1) {
+      carouselTrack.style.transition = "none";
+      goToSlide(1);
+    }
+    if (currentSlideIndex === 0) {
+      carouselTrack.style.transition = "none";
+      goToSlide(7);
+    }
+    console.log("end");
+  });
   function moveSlide(direction = "next") {
     if (direction === "next") {
-
-      // if (currentSlideIndex === numberOfElementsInCarousel) {
-      //   carouselTrack.style.transition= "none";
-      //   goToSlide(0);
-      // }
-
-      console.log(currentSlideIndex,numberOfElementsInCarousel);
-      if (currentSlideIndex >= numberOfIndexesInCarousel) {
-        goToSlide(0);
-      } else {
-        carouselTrack.style.transition= "transform 0.4s ease-in-out";
-        currentSlideIndex++;
-        goToSlide(currentSlideIndex);
-      }
+      currentSlideIndex++;
+/////////////////////////////////////////////////////////////////////////////////////currentSlideIndedx can get bigger than elements in carousel
+      carouselTrack.style.transition = "transform 0.4s ease-in-out";
+      goToSlide(currentSlideIndex);
     } else if (direction === "prev") {
-      if (currentSlideIndex <= 0) {
-        goToSlide(numberOfIndexesInCarousel);
-      } else {
-        currentSlideIndex--;
-        goToSlide(currentSlideIndex);
-      }
+      carouselTrack.style.transition = "transform 0.4s ease-in-out";
+
+      currentSlideIndex--;
+      goToSlide(currentSlideIndex);
     }
   }
+
   function buttons() {
     //create prev and next button dynamically
     //prev
     const buttonsContainer = document.createElement("div");
     buttonsContainer.classList.add("buttonsContainer");
     sliderContainer.appendChild(buttonsContainer);
-    
-    
+
     const prevButton = document.createElement("button");
     prevButton.textContent = "Prev";
     buttonsContainer.appendChild(prevButton);
@@ -331,7 +328,6 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
     const nextButton = document.createElement("button");
     nextButton.textContent = "Next";
     buttonsContainer.appendChild(nextButton);
-
 
     nextButton.addEventListener("click", () => {
       if (!isAutoplayPaused) {
@@ -541,7 +537,6 @@ carouselTrack.style.width = `${(containerWidth*numberOfElementsInCarousel)+(40*n
   autoplay();
 
   resizeSlider();
-
 }
 const sliders = document.querySelectorAll(".carousel-container");
 
