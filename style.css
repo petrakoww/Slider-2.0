@@ -10,14 +10,19 @@ body {
   flex-wrap: wrap;
 }
 
+.container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .carousel-container {
   position: relative;
   /* margin: auto; */
   padding: 0 0px 20px 0px;
-  /* overflow: hidden; */
   border: solid 5px black;
 
-  width: 750px;
+  width: 500px;
 }
 
 
@@ -42,7 +47,6 @@ body {
 
 .dotsContainer {
   display: flex;
-
   position: absolute;
   bottom: 0;
   left: 50%;

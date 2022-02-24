@@ -8,16 +8,17 @@ function slider(sliderContainer) {
   const overflowHidden = document.createElement("div");
   sliderContainer.insertAdjacentElement("afterbegin", overflowHidden);
   overflowHidden.style.overflow = "hidden";
-  const asd = [...carouselTrack.children];
+  const asd = [...carouselTrack.children]; ///not being used
 
   const autoplayButton = document.createElement("button");
+  const buttonsContainer = document.createElement("div");
 
   let currentSlideIndex = 0,
     transitionSize = 0,
-    slideWidths = [],
-    slideHeights = [],
+    slideWidths = [], ///not being used
+    slideHeights = [], ///not being used
     numberOfElementsInCarousel = slidesInCarousel.length,
-    numberOfIndexesInCarousel = numberOfElementsInCarousel - 1,
+    numberOfIndexesInCarousel = numberOfElementsInCarousel - 1, ///not being used
     startPosition,
     currPosition,
     navigationDots,
@@ -31,52 +32,90 @@ function slider(sliderContainer) {
     autoPlayInterval = 5000;
 
   let containerWidth = sliderContainer.clientWidth;
-
-  //full width of carousel
-  slidesInCarousel.forEach((slide, index) => {
-    slideWidths.push(slide.clientWidth);
-    slideHeights.push(slide.clientHeight);
-  });
-
-  carouselTrack.style.width = `${
-    containerWidth * numberOfElementsInCarousel +
-    40 * numberOfElementsInCarousel +
-    2 * containerWidth
-  }px`;
+  const initialContainerWidth = containerWidth;
 
   function resizeSlider() {
-    // if (slideHeights[currentSlideIndex] < 200) {
-    //   slideHeights[currentSlideIndex] = 200;
-    // }
-
-    // const wrappedEls = [
-    //   ...carouselTrack.querySelectorAll(".vasko-slide-wrapper"),
-    // ];
-
-    // wrappedEls[
-    //   currentSlideIndex
-    // ].childNodes[0].style.width = `${slideWidths[currentSlideIndex]}px`;
-    // wrappedEls[
-    //   currentSlideIndex
-    // ].childNodes[0].style.height = `${slideHeights[currentSlideIndex]}px`;
-
-    // carouselTrack.style.width = `${slideWidths[currentSlideIndex]}px`;
-    // carouselTrack.style.height = `${slideHeights[currentSlideIndex]}px`;
-    // slidesInCarousel.forEach((slide, index) => {
-    // slidesInCarousel[index].style.width = `${asd-80}px`;
-    // carouselTrack.style.width = `${asd-80}px`;
-    // });
+    {
+      // if (slideHeights[currentSlideIndex] < 200) {
+      //   slideHeights[currentSlideIndex] = 200;
+      // }
+      // const wrappedEls = [
+      //   ...carouselTrack.querySelectorAll(".vasko-slide-wrapper"),
+      // ];
+      // wrappedEls[
+      //   currentSlideIndex
+      // ].childNodes[0].style.width = `${slideWidths[currentSlideIndex]}px`;
+      // wrappedEls[
+      //   currentSlideIndex
+      // ].childNodes[0].style.height = `${slideHeights[currentSlideIndex]}px`;
+      // carouselTrack.style.width = `${slideWidths[currentSlideIndex]}px`;
+      // carouselTrack.style.height = `${slideHeights[currentSlideIndex]}px`;
+      // slidesInCarousel.forEach((slide, index) => {
+      // slidesInCarousel[index].style.width = `${asd-80}px`;
+      // carouselTrack.style.width = `${asd-80}px`;
+      // });
+    }
 
     window.addEventListener("resize", () => {
-      // containerWidth = 100;
+      let asd;
+      let buttonsShow =
+        buttonsContainer.childNodes[0].clientWidth +
+        buttonsContainer.childNodes[1].clientWidth +
+        (buttonsContainer.childNodes[0].clientWidth +
+          buttonsContainer.childNodes[1].clientWidth) /
+          2;
+      if (window.innerWidth < containerWidth) {
+        //resize carousel-container
+        sliderContainer.style.width = `${window.innerWidth - 11}px`;
+        containerWidth -= 1;
+        //resize divs
+        slidesInCarousel.forEach((slide, index) => {
+          carouselTrack.childNodes[index].style.width = `${containerWidth}px`;
+        });
+        asd = containerWidth;
+      } else {
+
+
+        //////////////////////////////////////////not working when increasing
+
+        sliderContainer.style.width = `${containerWidth}px`;
+        slidesInCarousel.forEach((slide, index) => {
+          carouselTrack.childNodes[
+            index
+          ].style.width = `${containerWidth}px`;
+        });
+
+
+        
+      }
+      if (window.innerWidth < initialContainerWidth + buttonsShow) {
+        buttonsContainer.style.left = "0px";
+        buttonsContainer.style.right = "0px";
+      } else {
+        buttonsContainer.style.left = "-37px";
+        buttonsContainer.style.right = "-37px";
+      }
+      ///activate if resize divs
       // carouselTrack.style.width = `${
-      //   containerWidth * numberOfElementsInCarousel +
-      //   40 * numberOfElementsInCarousel
+      //   containerWidth * numberOfElementsInCarousel + 2 * containerWidth
       // }px`;
-      // console.log(window.innerWidth);
-      // console.log(window.innerHeight);
     });
+    carouselTrack.style.width = `${
+      containerWidth * numberOfElementsInCarousel + 2 * containerWidth
+    }px`;
   }
+  //full width of carousel /////////////////////////////can delete
+  /// slidesInCarousel.forEach((slide, index) => {
+  //   slideWidths.push(slide.clientWidth);
+  //   slideHeights.push(slide.clientHeight);
+  // });
+
+  // carouselTrack.style.width = `${
+  //   containerWidth * numberOfElementsInCarousel +
+  //   // 40 * numberOfElementsInCarousel +
+  //   2 * containerWidth
+  // }px`;
+
   function autoplay() {
     if (enableAutoplay) {
       startAutoplay();
@@ -89,7 +128,7 @@ function slider(sliderContainer) {
     const autoplayDiv = document.createElement("div");
     sliderContainer.insertAdjacentElement("afterend", autoplayDiv);
     autoplayButton.textContent = "Pause";
-    autoplayButton.style.marginBottom = "10px";
+    autoplayButton.style.marginTop = "10px";
     autoplayDiv.insertAdjacentElement("afterbegin", autoplayButton);
 
     autoplayButton.addEventListener("click", autoplayBtnFn);
@@ -121,7 +160,7 @@ function slider(sliderContainer) {
     }
   }
   function mouseLeaveHandler() {
-    if (autoplayButton.textContent === "Pause") {
+    if (autoplayButton.textContent === "Pause" || !enableAutoplayButtons) {
       isAutoplayPaused = false;
     }
   }
@@ -144,20 +183,15 @@ function slider(sliderContainer) {
 
   function wrapEl() {
     carouselTrack.classList.add("carousel-track");
-    // let slideWrapper
     slidesInCarousel.forEach((slideContent) => {
       const slideWrapper = document.createElement("div");
       slideWrapper.classList.add("vasko-slide-wrapper");
       slideWrapper.style.width = `${containerWidth}px`;
-      // slideWrapper.style.marginRight = `${40}px`
-
-      // margin-right: 80px;
 
       slideWrapper.append(slideContent);
       carouselTrack.appendChild(slideWrapper);
     });
 
-    ///
     function smoothSlider() {
       const lastDiv = document.createElement("div");
       lastDiv.classList.add("lastClone");
@@ -181,25 +215,26 @@ function slider(sliderContainer) {
       slidesInCarousel.push(lastEL);
       slidesInCarousel.splice(0, 0, firstEl);
 
-      slideWidths.splice(0, 0, slideWidths[slideWidths.length - 1]);
-      slideHeights.splice(0, 0, slideHeights[slideHeights.length - 1]);
-      slideWidths.push(lastEL.width);
-      slideHeights.push(lastEL.height);
+      ///not being used
+      // slideWidths.splice(0, 0, slideWidths[slideWidths.length - 1]);
+      // slideHeights.splice(0, 0, slideHeights[slideHeights.length - 1]);
+      // slideWidths.push(lastEL.width);
+      // slideHeights.push(lastEL.height);
     }
     smoothSlider();
-    ///
 
     overflowHidden.appendChild(carouselTrack);
   }
   function InputDiv() {
+    carouselTrack.style.transition = "transform 0.4s ease-in-out";
     const inputDiv = document.createElement("div");
-    inputDiv.style.marginTop = "25px";
+    inputDiv.style.margin = "20px 0";
     sliderContainer.insertAdjacentElement("afterend", inputDiv);
 
     const goInput = document.createElement("input");
     goInput.type = "number";
     goInput.min = "1";
-    goInput.max = numberOfIndexesInCarousel + 1;
+    goInput.max = numberOfElementsInCarousel;
     inputDiv.insertAdjacentElement("afterbegin", goInput);
 
     const goButton = document.createElement("button");
@@ -207,9 +242,11 @@ function slider(sliderContainer) {
     inputDiv.insertAdjacentElement("beforeend", goButton);
 
     goButton.addEventListener("click", () => {
+      carouselTrack.style.transition = "transform 0.4s ease-in-out";
+
       if (
         goInput.value < 0 ||
-        goInput.value > numberOfIndexesInCarousel + 1 ||
+        goInput.value > numberOfElementsInCarousel ||
         goInput.value == ""
       ) {
         return;
@@ -240,7 +277,7 @@ function slider(sliderContainer) {
     }
 
     currentSlideIndex = slideToGo;
-    resizeSlider();
+    // resizeSlider();
   }
   function createNavDots() {
     const dotsContainer = document.createElement("div");
@@ -262,6 +299,7 @@ function slider(sliderContainer) {
     navigationDots = sliderContainer.querySelectorAll(".dot");
 
     dotsContainer.addEventListener("click", (e) => {
+      carouselTrack.style.transition = "transform 0.4s ease-in-out";
       transitionSize = 0;
 
       let { id } = e.target;
@@ -274,18 +312,19 @@ function slider(sliderContainer) {
       }
 
       currentSlideIndex = id;
+      ///can delete
       //sets inactive buttons grey and checks if e.target is accurate
-      if (e.target.classList.contains("dot")) {
-        navigationDots.forEach((dot) => {
-          if (dot.classList.contains("dot-red")) {
-            dot.classList.remove("dot-red");
-          }
-        });
-        navigationDots[currentSlideIndex].classList.add("dot-red");
-      }
+      // if (e.target.classList.contains("dot")) {
+      //   navigationDots.forEach((dot) => {
+      //     if (dot.classList.contains("dot-red")) {
+      //       dot.classList.remove("dot-red");
+      //     }
+      //   });
+      //   navigationDots[currentSlideIndex].classList.add("dot-red");
+      // }
     });
   }
-  function dsa() {
+  function endlessSlider() {
     if (currentSlideIndex === numberOfElementsInCarousel + 1) {
       carouselTrack.style.transition = "none";
       goToSlide(1);
@@ -297,35 +336,42 @@ function slider(sliderContainer) {
   }
   function moveSlide(direction = "next") {
     if (direction === "next") {
-      if (currentSlideIndex > numberOfIndexesInCarousel + 1) {
-        carouselTrack.addEventListener("transitionend", dsa);
-      } else {
-        carouselTrack.style.transition = "transform 0.4s ease-in-out";
-        currentSlideIndex++;
-        goToSlide(currentSlideIndex);
+      carouselTrack.addEventListener("transitionend", endlessSlider);
+      carouselTrack.style.transition = "transform 0.4s ease-in-out";
+      if (currentSlideIndex > numberOfElementsInCarousel) {
+        return;
       }
-      // currentSlideIndex++;
-      // carouselTrack.style.transition = "transform 0.4s ease-in-out";
-      // goToSlide(currentSlideIndex);
-    } else if (direction === "prev") {
-      // carouselTrack.style.transition = "transform 0.4s ease-in-out";
-      // currentSlideIndex--;
-      // goToSlide(currentSlideIndex);
+      currentSlideIndex++;
+      goToSlide(currentSlideIndex);
 
+      // if (currentSlideIndex > numberOfIndexesInCarousel + 1) {
+      //
+      // } else {
+      //   carouselTrack.style.transition = "transform 0.4s ease-in-out";
+      //   currentSlideIndex++;
+      //   goToSlide(currentSlideIndex);
+      // }
+    } else if (direction === "prev") {
+      carouselTrack.addEventListener("transitionend", endlessSlider);
+      carouselTrack.style.transition = "transform 0.4s ease-in-out";
       if (currentSlideIndex < 1) {
-        carouselTrack.addEventListener("transitionend", dsa);
-      } else {
-        carouselTrack.style.transition = "transform 0.4s ease-in-out";
-        currentSlideIndex--;
-        goToSlide(currentSlideIndex);
+        return;
       }
+      currentSlideIndex--;
+      goToSlide(currentSlideIndex);
+
+      // if (currentSlideIndex < 1) {
+      //
+      // } else {
+      //   carouselTrack.style.transition = "transform 0.4s ease-in-out";
+      //   currentSlideIndex--;
+      //   goToSlide(currentSlideIndex);
+      // }
     }
   }
-
   function buttons() {
     //create prev and next button dynamically
     //prev
-    const buttonsContainer = document.createElement("div");
     buttonsContainer.classList.add("buttonsContainer");
     sliderContainer.appendChild(buttonsContainer);
 
@@ -392,7 +438,8 @@ function slider(sliderContainer) {
           "translateX(" +
           (-transitionSize -
             leftClientBorderToSlider -
-            (slideWidths[currentSlideIndex] - e.clientX)) +
+            // (slideWidths[currentSlideIndex] - e.clientX)) +
+            (containerWidth - e.clientX)) +
           "px)";
       } else {
         carouselTrack.style.transform =
@@ -411,7 +458,6 @@ function slider(sliderContainer) {
     function sliderMouseUp() {
       pressed = false;
       sliderContainer.style.cursor = "grab";
-
       if (
         (startPosition - currPosition < 100 &&
           startPosition - currPosition > 0) ||
@@ -465,7 +511,8 @@ function slider(sliderContainer) {
           "translateX(" +
           (-transitionSize -
             leftClientBorderToSlider -
-            (slideWidths[currentSlideIndex] - e.touches[0].clientX)) +
+            // (slideWidths[currentSlideIndex] - e.touches[0].clientX)) +
+            (containerWidth - e.touches[0].clientX)) +
           "px)";
       } else {
         carouselTrack.style.transform =
@@ -508,10 +555,10 @@ function slider(sliderContainer) {
       buttons();
     }
     if (sliderContainer.dataset.dots === "true") {
-      if (sliderContainer.dataset.startfromindex > numberOfIndexesInCarousel) {
-        sliderContainer.dataset.startfromindex = numberOfIndexesInCarousel;
-      } else if (sliderContainer.dataset.startfromindex < 0) {
-        sliderContainer.dataset.startfromindex = 0;
+      if (sliderContainer.dataset.startfromindex > numberOfElementsInCarousel) {
+        sliderContainer.dataset.startfromindex = numberOfElementsInCarousel;
+      } else if (sliderContainer.dataset.startfromindex < 1) {
+        sliderContainer.dataset.startfromindex = 1;
       }
       createNavDots(sliderContainer.dataset.startfromindex);
       goToSlide(sliderContainer.dataset.startfromindex);
@@ -532,7 +579,7 @@ function slider(sliderContainer) {
       enableAutoplay = true;
       if (sliderContainer.dataset.autoplayinterval) {
         autoPlayInterval = parseInt(sliderContainer.dataset.autoplayinterval);
-        if (autoPlayInterval <= 1000) {
+        if (autoPlayInterval < 1000) {
           autoPlayInterval = 5000;
         }
       }
@@ -541,15 +588,15 @@ function slider(sliderContainer) {
       }
     }
   }
+
+  resizeSlider();
+
   wrapEl();
   dataSets();
   autoplay();
-
-  resizeSlider();
 }
 const sliders = document.querySelectorAll(".carousel-container");
 
 sliders.forEach((slide) => {
   slider(slide);
 });
-//add padding to transition
