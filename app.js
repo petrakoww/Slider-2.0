@@ -8,17 +8,13 @@ function slider(sliderContainer) {
   const overflowHidden = document.createElement("div");
   sliderContainer.insertAdjacentElement("afterbegin", overflowHidden);
   overflowHidden.style.overflow = "hidden";
-  const asd = [...carouselTrack.children]; ///not being used
 
   const autoplayButton = document.createElement("button");
   const buttonsContainer = document.createElement("div");
 
   let currentSlideIndex = 0,
     transitionSize = 0,
-    slideWidths = [], ///not being used
-    slideHeights = [], ///not being used
     numberOfElementsInCarousel = slidesInCarousel.length,
-    numberOfIndexesInCarousel = numberOfElementsInCarousel - 1, ///not being used
     startPosition,
     currPosition,
     navigationDots,
@@ -29,65 +25,66 @@ function slider(sliderContainer) {
     enableAutoplay = false,
     enableAutoplayButtons = false,
     isAutoplayPaused = false,
-    autoPlayInterval = 5000;
+    isResized = false,
+    autoPlayInterval = 5000,
+    enableWidth,
+    sliderSize;
 
   let containerWidth = sliderContainer.clientWidth;
+  // if (sliderContainer.dataset.slidersize) {
+  //   enableWidth = true;
+  //   sliderSize = parseInt(sliderContainer.dataset.slidersize);
+  // }
+  // if (enableWidth) {
+  //   console.log(enableWidth, sliderSize);
+  //   // sliderContainer.style.width = `${sliderSize}px`
+  //   // containerWidth = sliderSize;
+  // }
   const initialContainerWidth = containerWidth;
 
   function resizeSlider() {
-    {
-      // if (slideHeights[currentSlideIndex] < 200) {
-      //   slideHeights[currentSlideIndex] = 200;
-      // }
-      // const wrappedEls = [
-      //   ...carouselTrack.querySelectorAll(".vasko-slide-wrapper"),
-      // ];
-      // wrappedEls[
-      //   currentSlideIndex
-      // ].childNodes[0].style.width = `${slideWidths[currentSlideIndex]}px`;
-      // wrappedEls[
-      //   currentSlideIndex
-      // ].childNodes[0].style.height = `${slideHeights[currentSlideIndex]}px`;
-      // carouselTrack.style.width = `${slideWidths[currentSlideIndex]}px`;
-      // carouselTrack.style.height = `${slideHeights[currentSlideIndex]}px`;
-      // slidesInCarousel.forEach((slide, index) => {
-      // slidesInCarousel[index].style.width = `${asd-80}px`;
-      // carouselTrack.style.width = `${asd-80}px`;
-      // });
-    }
-
     window.addEventListener("resize", () => {
-      let asd;
       let buttonsShow =
         buttonsContainer.childNodes[0].clientWidth +
         buttonsContainer.childNodes[1].clientWidth +
         (buttonsContainer.childNodes[0].clientWidth +
           buttonsContainer.childNodes[1].clientWidth) /
           2;
-      if (window.innerWidth < containerWidth) {
-        //resize carousel-container
-        sliderContainer.style.width = `${window.innerWidth - 11}px`;
-        containerWidth -= 1;
-        //resize divs
-        slidesInCarousel.forEach((slide, index) => {
-          carouselTrack.childNodes[index].style.width = `${containerWidth}px`;
-        });
-        asd = containerWidth;
-      } else {
 
-
-        //////////////////////////////////////////not working when increasing
-
-        sliderContainer.style.width = `${containerWidth}px`;
+      if (window.innerWidth < initialContainerWidth) {
+        sliderContainer.style.width = `${window.innerWidth}px`;
         slidesInCarousel.forEach((slide, index) => {
           carouselTrack.childNodes[
             index
-          ].style.width = `${containerWidth}px`;
+          ].style.width = `${window.innerWidth}px`;
+          carouselTrack.childNodes[
+            index
+          ].childNodes[0].style.width = `${window.innerWidth}px`;
         });
+        carouselTrack.style.transform = `translateX(${
+          -window.innerWidth * currentSlideIndex
+        }px)`;
 
+        isResized = true;
+      } else {
+        sliderContainer.style.width = `${initialContainerWidth}px`;
+        slidesInCarousel.forEach((slide, index) => {
+          carouselTrack.childNodes[
+            index
+          ].style.width = `${initialContainerWidth}px`;
+          carouselTrack.childNodes[
+            index
+          ].childNodes[0].style.width = `${initialContainerWidth}px`;
 
-        
+          carouselTrack.style.transform = `translateX(${
+            -initialContainerWidth * currentSlideIndex
+          }px)`;
+
+          isResized = false;
+        });
       }
+
+      //buttons
       if (window.innerWidth < initialContainerWidth + buttonsShow) {
         buttonsContainer.style.left = "0px";
         buttonsContainer.style.right = "0px";
@@ -214,12 +211,6 @@ function slider(sliderContainer) {
 
       slidesInCarousel.push(lastEL);
       slidesInCarousel.splice(0, 0, firstEl);
-
-      ///not being used
-      // slideWidths.splice(0, 0, slideWidths[slideWidths.length - 1]);
-      // slideHeights.splice(0, 0, slideHeights[slideHeights.length - 1]);
-      // slideWidths.push(lastEL.width);
-      // slideHeights.push(lastEL.height);
     }
     smoothSlider();
 
@@ -262,11 +253,15 @@ function slider(sliderContainer) {
     transitionSize = 0;
     slidesInCarousel.forEach((slide, index) => {
       if (index < slideToGo) {
-        transitionSize += containerWidth;
+        if (isResized) {
+          transitionSize += window.innerWidth;
+        } else {
+          transitionSize += containerWidth;
+        }
       }
     });
-    carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
 
+    carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
     if (sliderContainer.dataset.dots === "true") {
       navigationDots.forEach((dot) => {
         if (dot.classList.contains("dot-red")) {
@@ -277,7 +272,6 @@ function slider(sliderContainer) {
     }
 
     currentSlideIndex = slideToGo;
-    // resizeSlider();
   }
   function createNavDots() {
     const dotsContainer = document.createElement("div");
@@ -312,16 +306,6 @@ function slider(sliderContainer) {
       }
 
       currentSlideIndex = id;
-      ///can delete
-      //sets inactive buttons grey and checks if e.target is accurate
-      // if (e.target.classList.contains("dot")) {
-      //   navigationDots.forEach((dot) => {
-      //     if (dot.classList.contains("dot-red")) {
-      //       dot.classList.remove("dot-red");
-      //     }
-      //   });
-      //   navigationDots[currentSlideIndex].classList.add("dot-red");
-      // }
     });
   }
   function endlessSlider() {
@@ -335,38 +319,21 @@ function slider(sliderContainer) {
     }
   }
   function moveSlide(direction = "next") {
+    carouselTrack.addEventListener("transitionend", endlessSlider);
     if (direction === "next") {
-      carouselTrack.addEventListener("transitionend", endlessSlider);
       carouselTrack.style.transition = "transform 0.4s ease-in-out";
       if (currentSlideIndex > numberOfElementsInCarousel) {
         return;
       }
       currentSlideIndex++;
       goToSlide(currentSlideIndex);
-
-      // if (currentSlideIndex > numberOfIndexesInCarousel + 1) {
-      //
-      // } else {
-      //   carouselTrack.style.transition = "transform 0.4s ease-in-out";
-      //   currentSlideIndex++;
-      //   goToSlide(currentSlideIndex);
-      // }
     } else if (direction === "prev") {
-      carouselTrack.addEventListener("transitionend", endlessSlider);
       carouselTrack.style.transition = "transform 0.4s ease-in-out";
       if (currentSlideIndex < 1) {
         return;
       }
       currentSlideIndex--;
       goToSlide(currentSlideIndex);
-
-      // if (currentSlideIndex < 1) {
-      //
-      // } else {
-      //   carouselTrack.style.transition = "transform 0.4s ease-in-out";
-      //   currentSlideIndex--;
-      //   goToSlide(currentSlideIndex);
-      // }
     }
   }
   function buttons() {
@@ -438,7 +405,6 @@ function slider(sliderContainer) {
           "translateX(" +
           (-transitionSize -
             leftClientBorderToSlider -
-            // (slideWidths[currentSlideIndex] - e.clientX)) +
             (containerWidth - e.clientX)) +
           "px)";
       } else {
@@ -456,6 +422,7 @@ function slider(sliderContainer) {
       sliderContainer.removeEventListener("mousemove", sliderMouseMove);
     }
     function sliderMouseUp() {
+      endlessSlider();
       pressed = false;
       sliderContainer.style.cursor = "grab";
       if (
@@ -511,7 +478,6 @@ function slider(sliderContainer) {
           "translateX(" +
           (-transitionSize -
             leftClientBorderToSlider -
-            // (slideWidths[currentSlideIndex] - e.touches[0].clientX)) +
             (containerWidth - e.touches[0].clientX)) +
           "px)";
       } else {
@@ -587,6 +553,10 @@ function slider(sliderContainer) {
         enableAutoplayButtons = true;
       }
     }
+    // if (sliderContainer.dataset.slidersize) {
+    //   enableWidth = true;
+    //   sliderSize = parseInt(sliderContainer.dataset.slidersize);
+    // }
   }
 
   resizeSlider();
