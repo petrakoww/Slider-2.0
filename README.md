@@ -17,7 +17,6 @@ Dataset Instructions:
 | autoplay               | Enables Autopplay | true/false           | true/false      | false          |
 | autoplayInterval       | Sets Autoplay's interval in milliseconds | 1000/∞          | 5000           |
 | autoplayButtons        | Pause/Resume buttons                     | true/false      | false          |
-| sliderSize             |                     |       |           |
 
 
 If startFromIndex input is < 1, value is set to 1(first element). If startFromIndex > numberOfAllElements, value is set to numberOfAllElements(last element).\
