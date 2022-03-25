@@ -3,60 +3,169 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Slider 2.0</title>
-    <link rel="stylesheet" href="style.css" />
+    <!-- <link rel="stylesheet" href="/Users/vasil/OneDrive/Работен плот/udemy/projects/slider2.0 bitbucket/style.css" />
+    <link rel="stylesheet" href="/Users/vasil/OneDrive/Работен плот/udemy/projects/slider2.0 bitbucket/website-specific-styles.css" /> -->
+    <!-- <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="website-specific-styles.css" /> -->
   </head>
   <body>
-    <div class="container">
-      <div
-        class="carousel-container"
-        data-button="true"
-        data-dots="true"
-        data-goto="true"
-        data-arrowKeys="true"
-        data-draggable="true"
-        data-draggableTouchFunction="true"
-        data-startFromIndex="1"
-        data-autoplay="false"
-        data-autoplayInterval="3000"
-        data-autoplayButtons="true"
-      >
-      <!-- resize track -->
-        <img src="./images/1.jpeg" alt="first picture" />
-        <img src="./images/2.jpeg" alt="second picture" />
-        <img src="./images/3.jpeg" alt="third picture" />
-        <img src="./images/1.jpeg" alt="first picture" />
-        <span
-          >test test test test test test testtestest test test test test test
-          test tes test test test test test test test testest test test test
-          test test testte stestest test test test test test testtes test test
-          test test test test testtes test test test test test test testtest
-          estest test test test test test testtestest test test test test test
-          testtestest test test test test test testtes</span
+    <div class="grid">
+      <h1 class="title">This is my demo webpage for VIP slider</h1>
+      <div class="row">
+        <div
+          class="vip-carousel-container"
+          data-button="true"
+          data-dots="true"
+          data-goto="true"
+          data-arrowKeys="true"
+          data-draggable="true"
+          data-draggableTouchFunction="true"
+          data-startFromIndex="1"
+          data-autoplay="false"
+          data-autoplayInterval="5000"
+          data-autoplayButtons="true"
+          data-infiniteTrack="false"
+          data-thresholdMobile="-50"
+          data-thresholdDesktop="200"
         >
-        <span>asd asd asd asd asd asd</span>
-        <span>12333333333333333</span>
+          <img src="../images/1.jpeg" alt="first picture" />
+          <img src="../images/2.jpeg" alt="second picture" />
+          <img src="../images/3.jpeg" alt="third picture" />
+          <img src="../images/1.jpeg" alt="first picture" />
+          <span
+            >test test test test test test testtestest test test test test test
+            test tes test test test test test test test testest test test test
+            test test testte stestest test test test test test testtes test test
+            test test test test testtes test test test test test test testtest
+            estest test test test test test testtestest test test test test test
+            testtestest test test test test test testtes</span
+          >
+          <span>asd asd asd asd asd asd</span> <span>12333333333333333</span>
+        </div>
       </div>
-
-      <!-- <div
-      class="carousel-container"
-      data-button="true"
-      data-dots="true"
-      data-arrowKeys="true"
-      data-draggable="true"
-      data-draggableTouchFunction="true"
-      data-startFromIndex="3"
-      data-autoPlay="true"
-    >
-      <img src="./images/1.jpeg" alt="first picture" />
-      <img src="./images/2.jpeg" alt="second picture" />
-      <img src="./images/3.jpeg" alt="third picture" />
-      <img src="./images/3.jpeg" alt="third picture" />
-      <img src="./images/2.jpeg" alt="second picture" />
-      <img src="./images/3.jpeg" alt="third picture" />
-    </div> -->
+      <div class="row three-quarter">
+        <div
+          class="vip-carousel-container"
+          data-button="true"
+          data-dots="true"
+          data-goto="true"
+          data-arrowKeys="true"
+          data-draggable="true"
+          data-draggableTouchFunction="true"
+          data-startFromIndex="1"
+          data-autoplay="true"
+          data-autoplayInterval="5000"
+          data-autoplayButtons="false"
+          data-infiniteTrack="false"
+        >
+          <img src="../images/1.jpeg" alt="first picture" />
+          <img src="../images/2.jpeg" alt="second picture" />
+          <img src="../images/3.jpeg" alt="third picture" />
+          <img src="../images/1.jpeg" alt="first picture" />
+          <span
+            >test test test test test test testtestest test test test test test
+            test tes test test test test test test test testest test test test
+            test test testte stestest test test test test test testtes test test
+            test test test test testtes test test test test test test testtest
+            estest test test test test test testtestest test test test test test
+            testtestest test test test test test testtes</span
+          >
+          <span>asd asd asd asd asd asd</span> <span>12333333333333333</span>
+        </div>
+      </div>
+      <div class="row one-half">
+        <div
+          class="vip-carousel-container"
+          data-button="true"
+          data-dots="true"
+          data-arrowKeys="true"
+          data-draggable="true"
+          data-draggableTouchFunction="true"
+          data-startFromIndex="3"
+          data-autoPlay="true"
+        >
+          <img src="../images/1.jpeg" alt="first picture" />
+          <img src="../images/2.jpeg" alt="second picture" />
+          <img src="../images/3.jpeg" alt="third picture" />
+          <img src="../images/3.jpeg" alt="third picture" />
+          <img src="../images/2.jpeg" alt="second picture" />
+          <img src="../images/3.jpeg" alt="third picture" />
+        </div>
+      </div>
+      <div class="row one-fourth">
+        <div
+          class="vip-carousel-container"
+          data-button="true"
+          data-dots="true"
+          data-goto="true"
+          data-arrowKeys="true"
+          data-draggable="true"
+          data-draggableTouchFunction="true"
+          data-startFromIndex="1"
+          data-autoplay="true"
+          data-autoplayInterval="5000"
+          data-autoplayButtons="false"
+          data-infiniteTrack="false"
+        >
+          <img src="../images/1.jpeg" alt="first picture" />
+          <img src="../images/2.jpeg" alt="second picture" />
+          <img src="../images/3.jpeg" alt="third picture" />
+          <img src="../images/1.jpeg" alt="first picture" />
+          <span
+            >test test test test test test testtestest test test test test test
+            test tes test test test test test test test testest test test test
+            test test testte stestest test test test test test testtes test test
+            test test test test testtes test test test test test test testtest
+            estest test test test test test testtestest test test test test test
+            testtestest test test test test test testtes</span
+          >
+          <span>asd asd asd asd asd asd</span> <span>12333333333333333</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div
+            class="vip-carousel-container"
+            data-button="true"
+            data-dots="true"
+            data-arrowKeys="true"
+            data-draggable="true"
+            data-draggableTouchFunction="true"
+            data-startFromIndex="3"
+            data-autoPlay="true"
+          >
+            <img src="../images/1.jpeg" alt="first picture" />
+            <img src="../images/2.jpeg" alt="second picture" />
+            <img src="../images/3.jpeg" alt="third picture" />
+            <img src="../images/3.jpeg" alt="third picture" />
+            <img src="../images/2.jpeg" alt="second picture" />
+            <img src="../images/3.jpeg" alt="third picture" />
+          </div>
+        </div>
+        <div class="col">
+          <div
+            class="vip-carousel-container"
+            data-button="true"
+            data-dots="true"
+            data-arrowKeys="true"
+            data-draggable="true"
+            data-draggableTouchFunction="true"
+            data-startFromIndex="3"
+            data-autoPlay="true"
+          >
+            <img src="../images/1.jpeg" alt="first picture" />
+            <img src="../images/2.jpeg" alt="second picture" />
+            <img src="../images/3.jpeg" alt="third picture" />
+            <img src="../images/3.jpeg" alt="third picture" />
+            <img src="../images/2.jpeg" alt="second picture" />
+            <img src="../images/3.jpeg" alt="third picture" />
+          </div>
+        </div>
+      </div>
     </div>
-    <script src="app.js"></script>
+    <!-- <script src="app.js"></script> -->
+    <!-- <script src="/Users/vasil/OneDrive/Работен плот/udemy/projects/slider2.0 bitbucket/app.js"></script> -->
   </body>
 </html>

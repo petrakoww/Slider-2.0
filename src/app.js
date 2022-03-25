@@ -1,3 +1,6 @@
+import "../style/style.css";
+import "../style/website-specific-styles.css";
+
 function slider(sliderContainer) {
   if (!sliderContainer) {
     return;
@@ -11,6 +14,7 @@ function slider(sliderContainer) {
 
   const autoplayButton = document.createElement("button");
   const buttonsContainer = document.createElement("div");
+  const goButton = document.createElement("button");
 
   let currentSlideIndex = 0,
     transitionSize = 0,
@@ -25,95 +29,130 @@ function slider(sliderContainer) {
     enableAutoplay = false,
     enableAutoplayButtons = false,
     isAutoplayPaused = false,
-    isResized = false,
-    autoPlayInterval = 5000;
-
-  let containerWidth = sliderContainer.clientWidth;
-  const initialContainerWidth = containerWidth;
+    autoPlayInterval = 5000,
+    isInfinite = true,
+    biggestElement = 0,
+    disableDraggableButtons = false,
+    thresholdMobile,
+    thresholdDesktop;
 
   carouselTrack.style.width = `${
-    containerWidth * numberOfElementsInCarousel + 2 * containerWidth
+    sliderContainer.clientWidth * numberOfElementsInCarousel +
+    2 * sliderContainer.clientWidth
   }px`;
 
-  if (window.innerWidth < initialContainerWidth) {
-    isResized = true;
+  function disableDragOnButtons() {
+    disableDraggableButtons = true;
   }
-  function resizeSlider() {
-    let buttonsShow =
-      buttonsContainer.childNodes[0].clientWidth +
-      buttonsContainer.childNodes[1].clientWidth +
-      (buttonsContainer.childNodes[0].clientWidth +
-        buttonsContainer.childNodes[1].clientWidth) /
-        2;
+  function enableDrag() {
+    disableDraggableButtons = false;
+  }
+  function disableButtons() {
+    buttonsContainer.style.visibility = "hidden";
+    if (currentSlideIndex == numberOfElementsInCarousel) {
+      buttonsContainer.childNodes[1].style.visibility = "vissible";
+      buttonsContainer.childNodes[1].disabled = true;
+      buttonsContainer.childNodes[1].classList.add("vip-disableArrows");
+    } else {
+      buttonsContainer.childNodes[1].style.visibility = "visible";
+      buttonsContainer.childNodes[1].disabled = false;
+      buttonsContainer.childNodes[1].classList.remove("vip-disableArrows");
+    }
 
-    if (window.innerWidth < initialContainerWidth) {
-      sliderContainer.style.width = `${window.innerWidth}px`;
+    if (currentSlideIndex == 1) {
+      buttonsContainer.childNodes[0].style.visibility = "visible";
+      buttonsContainer.childNodes[0].disabled = true;
+      buttonsContainer.childNodes[0].classList.add("vip-disableArrows");
+    } else {
+      buttonsContainer.childNodes[0].style.visibility = "visible";
+      buttonsContainer.childNodes[0].disabled = false;
+      buttonsContainer.childNodes[0].classList.remove("vip-disableArrows");
+    }
+  }
+
+  slidesInCarousel.forEach((slide) => {
+    if (biggestElement < slide.clientWidth) {
+      biggestElement = slide.clientWidth;
+    }
+  });
+  function resizeSlider() {
+    if (sliderContainer.clientWidth < biggestElement) {
       slidesInCarousel.forEach((slide, index) => {
-        carouselTrack.childNodes[index].style.width = `${window.innerWidth}px`;
         carouselTrack.childNodes[
           index
-        ].childNodes[0].style.width = `${window.innerWidth}px`;
+        ].style.width = `${sliderContainer.clientWidth}px`;
+        carouselTrack.childNodes[
+          index
+        ].childNodes[0].style.width = `${sliderContainer.clientWidth}px`;
       });
       carouselTrack.style.transform = `translateX(${
-        -window.innerWidth * currentSlideIndex
+        -sliderContainer.clientWidth * currentSlideIndex
       }px)`;
-
-      isResized = true;
     } else {
-      sliderContainer.style.width = `${initialContainerWidth}px`;
       slidesInCarousel.forEach((slide, index) => {
+        //div
         carouselTrack.childNodes[
           index
-        ].style.width = `${initialContainerWidth}px`;
-        carouselTrack.childNodes[
-          index
-        ].childNodes[0].style.width = `${initialContainerWidth}px`;
-
+        ].style.width = `${sliderContainer.clientWidth}px`;
+        // element
+        carouselTrack.childNodes[index].childNodes[0].style.width = `auto`;
+        //transition
         carouselTrack.style.transform = `translateX(${
-          -initialContainerWidth * currentSlideIndex
+          -sliderContainer.clientWidth * currentSlideIndex
         }px)`;
+
+        carouselTrack.style.width = `${
+          sliderContainer.clientWidth * numberOfElementsInCarousel +
+          2 * sliderContainer.clientWidth
+        }px`;
       });
-      isResized = false;
     }
-    console.log(isResized);
-    //buttons
-    if (window.innerWidth < initialContainerWidth + buttonsShow) {
-      buttonsContainer.style.left = "0px";
-      buttonsContainer.style.right = "0px";
-    } else {
-      buttonsContainer.style.left = "-37px";
-      buttonsContainer.style.right = "-37px";
-    }
-    ///activate if resize divs
-    // carouselTrack.style.width = `${
-    //   containerWidth * numberOfElementsInCarousel + 2 * containerWidth
-    // }px`;
-  }
-  function autoplay() {
-    if (enableAutoplay) {
-      startAutoplay();
-      if (enableAutoplayButtons) {
-        autoPlayButtons();
+    //accurate slide transition when resized
+    transitionSize = 0;
+    slidesInCarousel.forEach((slide, index) => {
+      if (index < currentSlideIndex) {
+        transitionSize += sliderContainer.clientWidth;
       }
-    }
+    });
   }
   function autoPlayButtons() {
-    const autoplayDiv = document.createElement("div");
-    sliderContainer.insertAdjacentElement("afterend", autoplayDiv);
+    const autoplayButtonContainer = document.createElement("div");
+    autoplayButtonContainer.classList.add("vip-autoplayButtonContainer");
+    sliderContainer.insertAdjacentElement("beforeend", autoplayButtonContainer);
     autoplayButton.textContent = "Pause";
-    autoplayButton.style.marginTop = "10px";
-    autoplayDiv.insertAdjacentElement("afterbegin", autoplayButton);
+    autoplayButtonContainer.insertAdjacentElement("afterbegin", autoplayButton);
+
+    if (!enableAutoplay && enableAutoplayButtons) {
+      autoplayButton.textContent = "Play";
+      // isAutoplayPaused = false;
+    }
 
     autoplayButton.addEventListener("click", autoplayBtnFn);
     function autoplayBtnFn() {
-      if (autoplayButton.textContent === "Resume") {
+      if (autoplayButton.textContent === "Play") {
         isAutoplayPaused = false;
         autoplayButton.textContent = "Pause";
       } else {
         isAutoplayPaused = true;
-        autoplayButton.textContent = "Resume";
+        autoplayButton.textContent = "Play";
+      }
+
+      if (
+        !enableAutoplay &&
+        enableAutoplayButtons &&
+        autoplayButton.textContent === "Pause"
+      ) {
+        isAutoplayPaused = false;
+        enableAutoplay = true;
+        startAutoplay();
       }
     }
+
+    autoplayButtonContainer.addEventListener(
+      "mouseenter",
+      disableDragOnButtons
+    );
+    autoplayButtonContainer.addEventListener("mouseleave", enableDrag);
   }
   function startAutoplay() {
     timeRemaining = autoPlayInterval;
@@ -155,11 +194,11 @@ function slider(sliderContainer) {
   }
 
   function wrapEl() {
-    carouselTrack.classList.add("carousel-track");
+    carouselTrack.classList.add("vip-carousel-track");
     slidesInCarousel.forEach((slideContent) => {
       const slideWrapper = document.createElement("div");
-      slideWrapper.classList.add("vasko-slide-wrapper");
-      slideWrapper.style.width = `${containerWidth}px`;
+      slideWrapper.classList.add("vip-slide-wrapper");
+      slideWrapper.style.width = `${sliderContainer.clientWidth}px`;
 
       slideWrapper.append(slideContent);
       carouselTrack.appendChild(slideWrapper);
@@ -167,11 +206,11 @@ function slider(sliderContainer) {
 
     function smoothSlider() {
       const lastDiv = document.createElement("div");
-      lastDiv.classList.add("lastClone");
-      lastDiv.style.width = `${containerWidth}px`;
+      lastDiv.classList.add("vip-slide-wrapper-lastClone");
+      lastDiv.style.width = `${sliderContainer.clientWidth}px`;
       const firstDiv = document.createElement("div");
-      firstDiv.classList.add("firstClone");
-      firstDiv.style.width = `${containerWidth}px`;
+      firstDiv.classList.add("vip-slide-wrapper-firstClone");
+      firstDiv.style.width = `${sliderContainer.clientWidth}px`;
 
       let selectFirstEl = carouselTrack.firstChild.firstChild;
       let selectLastEl = carouselTrack.lastChild.lastChild;
@@ -194,19 +233,18 @@ function slider(sliderContainer) {
   }
   function InputDiv() {
     carouselTrack.style.transition = "transform 0.4s ease-in-out";
-    const inputDiv = document.createElement("div");
-    inputDiv.style.margin = "20px 0";
-    sliderContainer.insertAdjacentElement("afterend", inputDiv);
+    const inputContainer = document.createElement("div");
+    inputContainer.classList.add("vip-inputContainer");
+    sliderContainer.insertAdjacentElement("beforeend", inputContainer);
 
     const goInput = document.createElement("input");
     goInput.type = "number";
     goInput.min = "1";
     goInput.max = numberOfElementsInCarousel;
-    inputDiv.insertAdjacentElement("afterbegin", goInput);
+    inputContainer.insertAdjacentElement("afterbegin", goInput);
 
-    const goButton = document.createElement("button");
     goButton.textContent = "GO";
-    inputDiv.insertAdjacentElement("beforeend", goButton);
+    inputContainer.insertAdjacentElement("beforeend", goButton);
 
     goButton.addEventListener("click", () => {
       carouselTrack.style.transition = "transform 0.4s ease-in-out";
@@ -224,44 +262,42 @@ function slider(sliderContainer) {
       }
       goToSlide(goInput.value);
     });
+
+    inputContainer.addEventListener("mouseenter", disableDragOnButtons);
+    inputContainer.addEventListener("mouseleave", enableDrag);
   }
   function goToSlide(slideToGo) {
     transitionSize = 0;
-    console.log(isResized);
     slidesInCarousel.forEach((slide, index) => {
       if (index < slideToGo) {
-        //////////////////// should not be here cuz it runs only once; its not dynamic
-        if (isResized) {
-          transitionSize += window.innerWidth;
-          //
-          containerWidth = window.innerWidth
-        } else {
-          transitionSize += containerWidth;
-          //
-          containerWidth = initialContainerWidth
-        }
+        transitionSize += sliderContainer.clientWidth;
       }
     });
+
     carouselTrack.style.transform = `translateX(${-transitionSize}px)`;
     if (sliderContainer.dataset.dots === "true") {
       navigationDots.forEach((dot) => {
-        if (dot.classList.contains("dot-red")) {
-          dot.classList.remove("dot-red");
+        if (dot.classList.contains("vip-dot-active")) {
+          dot.classList.remove("vip-dot-active");
         }
       });
-      navigationDots[slideToGo].classList.add("dot-red");
+      navigationDots[slideToGo].classList.add("vip-dot-active");
     }
-console.log(currentSlideIndex, slideToGo);
+
     currentSlideIndex = slideToGo;
+
+    if (sliderContainer.dataset.infinitetrack === "false") {
+      disableButtons();
+    }
   }
   function createNavDots() {
     const dotsContainer = document.createElement("div");
-    dotsContainer.classList.add("dotsContainer");
+    dotsContainer.classList.add("vip-dotsContainer");
     sliderContainer.appendChild(dotsContainer);
 
     slidesInCarousel.forEach((el, index) => {
       dot = document.createElement("button");
-      dot.className = "dot";
+      dot.className = "vip-dot";
 
       dot.id = index;
       dotsContainer.appendChild(dot);
@@ -271,7 +307,7 @@ console.log(currentSlideIndex, slideToGo);
     dotsContainer.childNodes[0].style.display = "none";
 
     //active button
-    navigationDots = sliderContainer.querySelectorAll(".dot");
+    navigationDots = sliderContainer.querySelectorAll(".vip-dot");
 
     dotsContainer.addEventListener("click", (e) => {
       carouselTrack.style.transition = "transform 0.4s ease-in-out";
@@ -288,6 +324,8 @@ console.log(currentSlideIndex, slideToGo);
 
       currentSlideIndex = id;
     });
+    dotsContainer.addEventListener("mouseenter", disableDragOnButtons);
+    dotsContainer.addEventListener("mouseleave", enableDrag);
   }
   function endlessSlider() {
     if (currentSlideIndex === numberOfElementsInCarousel + 1) {
@@ -301,35 +339,51 @@ console.log(currentSlideIndex, slideToGo);
   }
   function moveSlide(direction = "next") {
     carouselTrack.addEventListener("transitionend", endlessSlider);
+
     if (direction === "next") {
       carouselTrack.style.transition = "transform 0.4s ease-in-out";
       if (currentSlideIndex > numberOfElementsInCarousel) {
         return;
       }
       currentSlideIndex++;
-      goToSlide(currentSlideIndex);
+
+      if (!isInfinite && currentSlideIndex > numberOfElementsInCarousel) {
+        goToSlide(numberOfElementsInCarousel);
+        stopAutoplay();
+      } else {
+        goToSlide(currentSlideIndex);
+      }
+
+      // goToSlide(currentSlideIndex);
     } else if (direction === "prev") {
       carouselTrack.style.transition = "transform 0.4s ease-in-out";
       if (currentSlideIndex < 1) {
         return;
       }
       currentSlideIndex--;
-      goToSlide(currentSlideIndex);
+
+      if (!isInfinite && currentSlideIndex < 1) {
+        goToSlide(1);
+      } else {
+        goToSlide(currentSlideIndex);
+      }
+
+      // goToSlide(currentSlideIndex);
     }
   }
   function buttons() {
     //create prev and next button dynamically
     //prev
-    buttonsContainer.classList.add("buttonsContainer");
+    buttonsContainer.classList.add("vip-buttonsContainer");
     sliderContainer.appendChild(buttonsContainer);
 
     const prevButton = document.createElement("button");
-    prevButton.textContent = "Prev";
+    prevButton.classList.add("vip-arrow", "left");
     buttonsContainer.appendChild(prevButton);
 
     //next
     const nextButton = document.createElement("button");
-    nextButton.textContent = "Next";
+    nextButton.classList.add("vip-arrow", "right");
     buttonsContainer.appendChild(nextButton);
 
     nextButton.addEventListener("click", () => {
@@ -338,82 +392,96 @@ console.log(currentSlideIndex, slideToGo);
       }
       moveSlide("next");
     });
-
+    nextButton.addEventListener("mouseenter", disableDragOnButtons);
+    nextButton.addEventListener("mouseleave", enableDrag);
     prevButton.addEventListener("click", () => {
       if (!isAutoplayPaused) {
         resetAutoplay();
       }
       moveSlide("prev");
     });
+    prevButton.addEventListener("mouseenter", disableDragOnButtons);
+    prevButton.addEventListener("mouseleave", enableDrag);
   }
-  function arrowKeys() {
+  function arrowKeysEnter() {
     window.addEventListener("keydown", (e) => {
       if (e.key === "ArrowLeft") {
         moveSlide("prev");
       } else if (e.key === "ArrowRight") {
         moveSlide("next");
+      } else if (e.key === "Enter") {
+        goButton.click();
       }
     });
   }
   function draggable() {
     let pressed = false;
 
-    console.log(isResized);
-
-    sliderContainer.addEventListener("click", sliderClick);
-    sliderContainer.addEventListener("mousedown", sliderMouseDown);
-    sliderContainer.addEventListener("mouseenter", sliderMouseEnter);
+    carouselTrack.addEventListener("click", sliderClick);
+    carouselTrack.addEventListener("mousedown", sliderMouseDown);
+    carouselTrack.addEventListener("mouseenter", sliderMouseEnter);
 
     function sliderMouseEnter() {
-      sliderContainer.style.cursor = "grab";
+      carouselTrack.style.cursor = "grab";
     }
 
     function sliderMouseDown(e) {
-      e.preventDefault();
+      if (e.target.parentNode.classList !== "vip-slide-wrapper") {
+        e.preventDefault();
+      }
       pressed = true;
-      sliderContainer.style.cursor = "grabbing";
-      sliderContainer.addEventListener("mousemove", sliderMouseMove);
+      carouselTrack.style.cursor = "grabbing";
+      carouselTrack.addEventListener("mousemove", sliderMouseMove);
+
+      if (disableDraggableButtons) {
+        carouselTrack.removeEventListener("mousemove", sliderMouseMove);
+      }
 
       currPosition = sliderContainer.getBoundingClientRect().x + e.clientX;
+      carouselTrack.addEventListener("mouseleave", sliderMouseLeave);
     }
     function sliderMouseMove(e) {
       pressed = true;
-      sliderContainer.style.cursor = "grabbing";
-      // e.preventDefault();
+      carouselTrack.style.cursor = "grabbing";
       leftClientBorderToSlider = sliderContainer.getBoundingClientRect().x;
-
-      console.log(transitionSize, leftClientBorderToSlider, containerWidth);
 
       startPosition = sliderContainer.getBoundingClientRect().x + e.clientX;
       if (startPosition < currPosition) {
+        if (currentSlideIndex == numberOfElementsInCarousel && !isInfinite) {
+          return;
+        }
         carouselTrack.style.transform =
           "translateX(" +
           (-transitionSize -
             leftClientBorderToSlider -
-            (containerWidth - e.clientX)) +
+            (sliderContainer.clientWidth - e.clientX)) +
           "px)";
       } else {
+        if (currentSlideIndex == 1 && !isInfinite) {
+          return;
+        }
         carouselTrack.style.transform =
           "translateX(" +
           (-transitionSize - (leftClientBorderToSlider - e.clientX)) +
           "px)";
       }
 
-      sliderContainer.addEventListener("mouseleave", sliderMouseLeave);
-      sliderContainer.addEventListener("mouseup", sliderMouseUp);
+      carouselTrack.addEventListener("mouseleave", sliderMouseLeave);
+      carouselTrack.addEventListener("mouseup", sliderMouseUp);
     }
     function sliderClick() {
-      sliderContainer.style.cursor = "grab";
-      sliderContainer.removeEventListener("mousemove", sliderMouseMove);
+      carouselTrack.style.cursor = "grab";
+      carouselTrack.removeEventListener("mousemove", sliderMouseMove);
     }
     function sliderMouseUp() {
       endlessSlider();
       pressed = false;
-      sliderContainer.style.cursor = "grab";
+      carouselTrack.style.cursor = "grab";
       if (
-        (startPosition - currPosition < 100 &&
+        (startPosition - currPosition < thresholdDesktop &&
           startPosition - currPosition > 0) ||
-        (currPosition - startPosition > 0 && currPosition - startPosition < 100)
+        (currPosition - startPosition > 0 &&
+          currPosition - startPosition < thresholdDesktop)
       ) {
         if (!isAutoplayPaused) {
           resetAutoplay();
@@ -433,9 +501,9 @@ console.log(currentSlideIndex, slideToGo);
         }
       }
 
-      sliderContainer.removeEventListener("mousemove", sliderMouseMove);
-      sliderContainer.removeEventListener("mouseleave", sliderMouseLeave);
-      sliderContainer.removeEventListener("mouseup", sliderMouseUp);
+      carouselTrack.removeEventListener("mousemove", sliderMouseMove);
+      carouselTrack.removeEventListener("mouseleave", sliderMouseLeave);
+      carouselTrack.removeEventListener("mouseup", sliderMouseUp);
     }
     function sliderMouseLeave(e) {
       pressed = false;
@@ -459,13 +527,19 @@ console.log(currentSlideIndex, slideToGo);
         sliderContainer.getBoundingClientRect().x + e.touches[0].clientX;
 
       if (startPosition > currPosition) {
+        if (currentSlideIndex == numberOfElementsInCarousel && !isInfinite) {
+          return;
+        }
         carouselTrack.style.transform =
           "translateX(" +
           (-transitionSize -
             leftClientBorderToSlider -
-            (containerWidth - e.touches[0].clientX)) +
+            (sliderContainer.clientWidth - e.touches[0].clientX)) +
           "px)";
       } else {
+        if (currentSlideIndex == 1 && !isInfinite) {
+          return;
+        }
         carouselTrack.style.transform =
           "translateX(" +
           (-transitionSize -
@@ -476,9 +550,10 @@ console.log(currentSlideIndex, slideToGo);
     function touchEnd() {
       resumeAutoplay();
       if (
-        (startPosition - currPosition < 100 &&
+        (startPosition - currPosition < thresholdMobile &&
           startPosition - currPosition > 0) ||
-        (currPosition - startPosition > 0 && currPosition - startPosition < 100)
+        (currPosition - startPosition > 0 &&
+          currPosition - startPosition < thresholdMobile)
       ) {
         if (!isAutoplayPaused) {
           resetAutoplay();
@@ -514,11 +589,22 @@ console.log(currentSlideIndex, slideToGo);
       createNavDots(sliderContainer.dataset.startfromindex);
       goToSlide(sliderContainer.dataset.startfromindex);
     }
-    if (sliderContainer.dataset.goto === "true") {
-      InputDiv();
-    }
     if (sliderContainer.dataset.arrowkeys === "true") {
-      arrowKeys();
+      arrowKeysEnter();
+    }
+    if (sliderContainer.dataset.thresholdmobile) {
+      if (sliderContainer.dataset.thresholdmobile <= 0) {
+        thresholdMobile = 50;
+      } else {
+        thresholdMobile = sliderContainer.dataset.thresholdmobile;
+      }
+    }
+    if (sliderContainer.dataset.thresholddesktop) {
+      if (sliderContainer.dataset.thresholddesktop <= 0) {
+        thresholdDesktop = 100;
+      } else {
+        thresholdDesktop = sliderContainer.dataset.thresholddesktop;
+      }
     }
     if (sliderContainer.dataset.draggable === "true") {
       draggable();
@@ -528,15 +614,30 @@ console.log(currentSlideIndex, slideToGo);
     }
     if (sliderContainer.dataset.autoplay === "true") {
       enableAutoplay = true;
+      startAutoplay();
       if (sliderContainer.dataset.autoplayinterval) {
         autoPlayInterval = parseInt(sliderContainer.dataset.autoplayinterval);
         if (autoPlayInterval < 1000) {
           autoPlayInterval = 5000;
         }
       }
-      if (sliderContainer.dataset.autoplaybuttons === "true") {
-        enableAutoplayButtons = true;
+    }
+    if (sliderContainer.dataset.autoplaybuttons === "true") {
+      enableAutoplayButtons = true;
+      autoPlayButtons();
+      if (sliderContainer.dataset.autoplayinterval) {
+        autoPlayInterval = parseInt(sliderContainer.dataset.autoplayinterval);
+        if (autoPlayInterval < 1000) {
+          autoPlayInterval = 5000;
+        }
       }
+    }
+    if (sliderContainer.dataset.goto === "true") {
+      InputDiv();
+    }
+    if (sliderContainer.dataset.infinitetrack === "false") {
+      disableButtons();
+      isInfinite = false;
     }
   }
 
@@ -545,9 +646,8 @@ console.log(currentSlideIndex, slideToGo);
 
   wrapEl();
   dataSets();
-  autoplay();
 }
-const sliders = document.querySelectorAll(".carousel-container");
+const sliders = document.querySelectorAll(".vip-carousel-container");
 
 sliders.forEach((slide) => {
   slider(slide);
